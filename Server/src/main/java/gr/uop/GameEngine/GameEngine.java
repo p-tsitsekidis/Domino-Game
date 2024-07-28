@@ -43,6 +43,40 @@ public class GameEngine {
         return tiles;
     }
 
+    public boolean playTile(Tile tile) {
+        if (lineOfPlay.isEmpty()) {
+            lineOfPlay.add(tile);
+            currentPlayer.removeTile(tile);
+            switchPlayer();
+            return true;
+        }
+
+        Tile lastTile = lineOfPlay.get(lineOfPlay.size() - 1);
+        if (tile.fits(lastTile.getUpperValue()) || tile.fits(lastTile.getBottomValue())) {
+            if (!tile.fits(lastTile.getUpperValue())) {
+                tile.invert();
+            }
+            lineOfPlay.add(tile);
+            currentPlayer.removeTile(tile);
+            switchPlayer();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void switchPlayer() {
+        currentPlayer = (currentPlayer == player1) ? player2 : player1;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public List<Tile> getLineOfPlay() {
+        return lineOfPlay;
+    }
+
     // public List getOpenEnds() {
 
     // }
