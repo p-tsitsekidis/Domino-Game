@@ -1,15 +1,18 @@
 package gr.uop.GameEngine;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Player {
 
     private String name;
-    private ArrayList<Tile> tiles = new ArrayList<>();
+    private ArrayList<Tile> tiles;
     private int score;
 
-    public Player(String name) {
+    public Player(String name, List<Tile> tiles) {
         this.name = name;
+        this.tiles = new ArrayList<>(tiles);
+        this.score = 0;
     }
 
     public String getName() {
