@@ -78,6 +78,16 @@ public class GameEngine {
         return false; //Doesn't fit
     }
 
+    public boolean drawTile() { //If a player cannot play
+        if (stock.isEmpty()) {
+            return false;
+        }
+    
+        Tile drawnTile = stock.poll();
+        currentPlayer.addTile(drawnTile);
+        return true;
+    }
+    
     private void switchPlayer() {
         currentPlayer = (currentPlayer == player1) ? player2 : player1;
     }
