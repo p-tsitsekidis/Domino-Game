@@ -90,11 +90,23 @@ public class GameEngine {
         return lineOfPlay;
     }
 
-    // public List getOpenEnds() {
+    public int[] getOpenEnds() { //Array is extremely efficient since we only have 2 open ends (No spinners)
+        int[] openEnds = new int[2];
+        if (!lineOfPlay.isEmpty()) {
+            openEnds[0] = lineOfPlay.getFirst().getUpperValue();
+            openEnds[1] = lineOfPlay.getLast().getBottomValue();
+        }
+        return openEnds;
+    }
 
-    // }
-
-    // public LinkedHashMap getLineOfPlay() {
-        
-    // }
+    @Override
+    public String toString() {
+        return "GameEngine{" +
+                "stock=" + stock +
+                ", lineOfPlay=" + lineOfPlay +
+                ", player1=" + player1 +
+                ", player2=" + player2 +
+                ", currentPlayer=" + currentPlayer +
+                '}';
+    }
 }
