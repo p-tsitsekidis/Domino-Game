@@ -87,6 +87,39 @@ public class GameEngine {
         currentPlayer.addTile(drawnTile);
         return true;
     }
+
+    public boolean canPlay() { //Check whether a player can play
+        for (Tile tile : currentPlayer.getTiles()) {
+            if (lineOfPlay.isEmpty() || tile.fits(lineOfPlay.getFirst().getUpperValue()) || tile.fits(lineOfPlay.getLast().getBottomValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isGameOver() {
+        return player1.getTiles().isEmpty() || player2.getTiles().isEmpty() || (!canPlay() && stock.isEmpty());
+    }
+
+    public Player getWinner() { //Returns the winning player
+        if (player1.getTiles().isEmpty()) {
+            return player1;
+        } else if (player2.getTiles().isEmpty()) {
+            return player2;
+        } else {
+            int player1Sum = 0;
+            for (Tile tile : player1.getTiles()) {
+                player1Sum += tile.getUpperValue() + tile.getBottomValue();
+            }
+            
+            int player2Sum = 0;
+            for (Tile tile : player2.getTiles()) {
+                player2Sum += tile.getUpperValue() + tile.getBottomValue();
+            }
+            
+            return player1Sum < player2Sum ? player1 : player2;
+        }
+    }
     
     private void switchPlayer() {
         currentPlayer = (currentPlayer == player1) ? player2 : player1;
