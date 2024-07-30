@@ -58,7 +58,7 @@ public class GameEngine {
         Tile lastTile = lineOfPlay.getLast();
 
         if (tile.fits(firstTile.getUpperValue())) { //Check if matches the first tile
-            if (!tile.fits(firstTile.getUpperValue())) {
+            if (tile.getBottomValue() != firstTile.getUpperValue()) {
                 tile.invert();
             }
             lineOfPlay.addFirst(tile);
@@ -66,7 +66,7 @@ public class GameEngine {
             switchPlayer();
             return true;
         } else if (tile.fits(lastTile.getBottomValue())) { //Check if matched the last tile
-            if (!tile.fits(lastTile.getBottomValue())) {
+            if (tile.getUpperValue() != lastTile.getBottomValue()) {
                 tile.invert();
             }
             lineOfPlay.addLast(tile);
@@ -90,7 +90,7 @@ public class GameEngine {
 
     public boolean canPlay() { //Check whether a player can play
         for (Tile tile : currentPlayer.getTiles()) {
-            if (lineOfPlay.isEmpty() || tile.fits(lineOfPlay.getFirst().getUpperValue()) || tile.fits(lineOfPlay.getLast().getBottomValue())) {
+            if (tile.fits(lineOfPlay.getFirst().getUpperValue()) || tile.fits(lineOfPlay.getLast().getBottomValue())) {
                 return true;
             }
         }
