@@ -6,15 +6,16 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 public class GameEngine {
     
-    private Deque<Tile> stock;
+    private Queue<Tile> stock;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
-    private List<Tile> lineOfPlay;
+    private Deque<Tile> lineOfPlay;
 
     public GameEngine(String player1Name, String player2Name) {
         stock = createDominoStock();
@@ -24,19 +25,19 @@ public class GameEngine {
         List<Tile> player2Tiles = new ArrayList<>();
 
         for (int i = 0; i < 7; i++) {
-            player1Tiles.add(stock.pop());
-            player2Tiles.add(stock.pop());
+            player1Tiles.add(stock.poll());
+            player2Tiles.add(stock.poll());
         }
 
         player1 = new Player(player1Name, player1Tiles);
         player2 = new Player(player2Name, player2Tiles);
         currentPlayer = player1;
 
-        lineOfPlay = new ArrayList<>();
+        lineOfPlay = new LinkedList<>();
     }
 
-    private Deque<Tile> createDominoStock() {
-        Deque<Tile> tiles = new LinkedList<>();
+    private Queue<Tile> createDominoStock() {
+        Queue<Tile> tiles = new LinkedList<>();
         for (int i = 0; i <= 6; i++) {
             for (int j = 0; j <= i; j++) {
                 tiles.add(new Tile(i, j));
@@ -53,7 +54,7 @@ public class GameEngine {
             return true;
         }
 
-        Tile lastTile = lineOfPlay.get(lineOfPlay.size() - 1);
+        Tile lastTile = lineOfPlay.getLast();
         if (tile.fits(lastTile.getUpperValue()) || tile.fits(lastTile.getBottomValue())) {
             if (!tile.fits(lastTile.getUpperValue())) {
                 tile.invert();
@@ -75,7 +76,7 @@ public class GameEngine {
         return currentPlayer;
     }
 
-    public List<Tile> getLineOfPlay() {
+    public Deque<Tile> getLineOfPlay() {
         return lineOfPlay;
     }
 
