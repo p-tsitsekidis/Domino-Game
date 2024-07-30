@@ -47,25 +47,35 @@ public class GameEngine {
     }
 
     public boolean playTile(Tile tile) {
-        if (lineOfPlay.isEmpty()) {
+        if (lineOfPlay.isEmpty()) { //Empty line of play
             lineOfPlay.add(tile);
             currentPlayer.removeTile(tile);
             switchPlayer();
             return true;
         }
 
+        Tile firstTile = lineOfPlay.getFirst();
         Tile lastTile = lineOfPlay.getLast();
-        if (tile.fits(lastTile.getUpperValue()) || tile.fits(lastTile.getBottomValue())) {
-            if (!tile.fits(lastTile.getUpperValue())) {
+
+        if (tile.fits(firstTile.getUpperValue())) { //Check if matches the first tile
+            if (!tile.fits(firstTile.getUpperValue())) {
                 tile.invert();
             }
-            lineOfPlay.add(tile);
+            lineOfPlay.addFirst(tile);
+            currentPlayer.removeTile(tile);
+            switchPlayer();
+            return true;
+        } else if (tile.fits(lastTile.getBottomValue())) { //Check if matched the last tile
+            if (!tile.fits(lastTile.getBottomValue())) {
+                tile.invert();
+            }
+            lineOfPlay.addLast(tile);
             currentPlayer.removeTile(tile);
             switchPlayer();
             return true;
         }
 
-        return false;
+        return false; //Doesn't fit
     }
 
     private void switchPlayer() {
