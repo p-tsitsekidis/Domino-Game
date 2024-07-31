@@ -88,7 +88,10 @@ public class GameEngine {
         return true;
     }
 
-    public boolean canPlay() { //Check whether a player can play
+    public boolean canPlay() {
+        if (lineOfPlay.isEmpty()) {
+            return true;
+        }
         for (Tile tile : currentPlayer.getTiles()) {
             if (tile.fits(lineOfPlay.getFirst().getUpperValue()) || tile.fits(lineOfPlay.getLast().getBottomValue())) {
                 return true;
