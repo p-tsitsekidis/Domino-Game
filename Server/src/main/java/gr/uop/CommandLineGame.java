@@ -56,5 +56,8 @@ public class CommandLineGame {
         // Game over
         Player winner = gameEngine.getWinner();
         System.out.println("Game over! The winner is: " + winner.getName());
+        System.out.println("Final scores:");
+        System.out.println(player1Name + ": " + gameEngine.getPlayer1().getScore() + " points");
+        System.out.println(player2Name + ": " + gameEngine.getPlayer2().getScore() + " points");
     }
 }
