@@ -3,11 +3,9 @@ package gr.uop.GameEngine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Random;
 
 public class GameEngine {
     
@@ -106,22 +104,32 @@ public class GameEngine {
 
     public Player getWinner() { //Returns the winning player
         if (player1.getTiles().isEmpty()) {
+            calculateFinalScore(player1, player2);
             return player1;
         } else if (player2.getTiles().isEmpty()) {
+            calculateFinalScore(player2, player1);
             return player2;
         } else {
-            int player1Sum = 0;
-            for (Tile tile : player1.getTiles()) {
-                player1Sum += tile.getUpperValue() + tile.getBottomValue();
+            int player1Sum = calculateHandSum(player1);
+            int player2Sum = calculateHandSum(player2);
+
+            if (player1Sum < player2Sum) {
+                player1.updateScore(player2Sum - player1Sum);
+                return player1;
+            } else {
+                player2.updateScore(player1Sum - player2Sum);
+                return player2;
             }
-            
-            int player2Sum = 0;
-            for (Tile tile : player2.getTiles()) {
-                player2Sum += tile.getUpperValue() + tile.getBottomValue();
-            }
-            
-            return player1Sum < player2Sum ? player1 : player2;
         }
+    }
+
+    private void calculateFinalScore(Player winner, Player loser) {
+        int loserHandSum = calculateHandSum(loser);
+        winner.updateScore(loserHandSum);
+    }
+
+    private int calculateHandSum(Player player) {
+        return player.getTiles().stream().mapToInt(tile -> tile.getUpperValue() + tile.getBottomValue()).sum();
     }
     
     private void switchPlayer() {
@@ -144,6 +152,14 @@ public class GameEngine {
         }
         return openEnds;
     }
+
+    public Player getPlayer1() {
+        return player1;
+    }
+    
+    public Player getPlayer2() {
+        return player2;
+    }    
 
     @Override
     public String toString() {
