@@ -6,6 +6,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 
 public class GameEngine {
     
@@ -29,7 +30,9 @@ public class GameEngine {
 
         player1 = new Player(player1Name, player1Tiles);
         player2 = new Player(player2Name, player2Tiles);
-        currentPlayer = player1;
+        
+        Random random = new Random();
+        currentPlayer = random.nextBoolean() ? player1 : player2;
 
         lineOfPlay = new LinkedList<>();
     }
