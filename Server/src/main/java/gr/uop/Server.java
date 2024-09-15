@@ -1,48 +1,40 @@
 package gr.uop;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-
 import java.util.Scanner;
 
-public class Server extends Application {
+public class Server {
 
-    @Override
-    public void start(Stage stage) {
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Choose the game version:");
-        System.out.println("1. Command Line");
-        System.out.println("2. JavaFX");
+        System.out.println("1. Command Line (Local)");
+        System.out.println("2. Networked Server");
         System.out.print("Enter your choice: ");
 
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); //Consume newline
 
         switch (choice) {
             case 1:
-                CommandLineGame.main(new String[]{});
+                runCommandLineGame();  //Run command line game locally
                 break;
             case 2:
-                launchJavaFX(stage);
+                runNetworkedServer();  //Run command line game on the networked server
                 break;
             default:
                 System.out.println("Invalid choice. Exiting...");
                 break;
         }
+        scanner.close();
     }
 
-    private void launchJavaFX(Stage stage) {
-        var label = new Label("Hello, JavaFX Server");
-        var scene = new Scene(new StackPane(label), 640, 480);
-        stage.setScene(scene);
-        stage.show();
+    private static void runCommandLineGame() {
+        CommandLineGame.main(new String[]{});
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    private static void runNetworkedServer() {
+        DominoServer server = new DominoServer();
+        server.startServer();
     }
 }
