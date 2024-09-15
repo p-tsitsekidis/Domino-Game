@@ -28,17 +28,21 @@ public class DominoServer {
             System.out.println("Player 1 connected.");
             Scanner fromPlayer1 = new Scanner(player1Socket.getInputStream());
             PrintWriter toPlayer1 = new PrintWriter(player1Socket.getOutputStream(), true);
+            toPlayer1.println("Waiting for Player 2 to connect...");
 
             //Player 2 initialize
             System.out.println("Waiting for Player 2 to connect...");
             Socket player2Socket = serverSocket.accept();
             System.out.println("Player 2 connected.");
+            toPlayer1.println("Player 2 connected");
             Scanner fromPlayer2 = new Scanner(player2Socket.getInputStream());
             PrintWriter toPlayer2 = new PrintWriter(player2Socket.getOutputStream(), true);
+            toPlayer2.println("Waiting for Player 1 to enter their name...");
 
             //Get player names from the clients
             toPlayer1.println("Please enter your name:");
             String player1Name = fromPlayer1.nextLine();
+            toPlayer1.println("Waiting for Player 2 to enter their name...");
             toPlayer2.println("Please enter your name:");
             String player2Name = fromPlayer2.nextLine();
 
