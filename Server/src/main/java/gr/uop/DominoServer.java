@@ -45,7 +45,6 @@ public class DominoServer {
             //Initialize GameEngine
             gameEngine = new GameEngine(player1Name, player2Name);
             Player player1 = gameEngine.getPlayer1();
-            Player player2 = gameEngine.getPlayer2();
 
             toPlayer1.println("Hello " + player1Name + "! The game is starting...");
             toPlayer2.println("Hello " + player2Name + "! The game is starting...");
