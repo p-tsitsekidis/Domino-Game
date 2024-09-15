@@ -59,7 +59,7 @@ public class Client {
             }
 
             //Game over
-            if (serverMessage.contains("Game over")) {
+            if (serverMessage.contains("scored")) {
                 break;
             }
         }
