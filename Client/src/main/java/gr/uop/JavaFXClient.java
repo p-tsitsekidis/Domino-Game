@@ -26,6 +26,7 @@ public class JavaFXClient extends Application {
     private Scanner fromServer;
 
     private String playerName;
+    private String otherPlayerName;
     private String serverAddress;
 
     private Label statusLabel;
@@ -133,7 +134,7 @@ public class JavaFXClient extends Application {
         }
     }
 
-    private void handleServerMessages() {
+    private void handleServerMessages() { // This is constantly listening
         while (fromServer.hasNextLine()) {
             String serverMessage = fromServer.nextLine();
             Platform.runLater(() -> processServerMessage(serverMessage));
@@ -152,6 +153,15 @@ public class JavaFXClient extends Application {
                 closeInitializationScreen();
                 startGameScreen();
             });
+        } else if (serverMessage.contains("OTHER")) {
+            otherPlayerName = serverMessage.substring(5);
+            System.out.println(otherPlayerName);
+        } else if (serverMessage.contains("TILES")) {
+            
+        } else if (serverMessage.contains("It's your turn")) {
+            //Label it's your turn (your name)
+        } else if (serverMessage.contains("Waiting for")) {
+            //Label it's your opponents turn (name of other player)
         }
     }
 
