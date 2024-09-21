@@ -52,10 +52,7 @@ public class DominoServer {
             Player player2 = gameEngine.getPlayer2();
 
             toPlayer1.println("Hello " + player1Name + "! The game is starting...");
-            toPlayer1.println("OTHER" + player2Name);
-
             toPlayer2.println("Hello " + player2Name + "! The game is starting...");
-            toPlayer2.println("OTHER" + player1Name);
 
             //Main game loop
             boolean gameOver = false;
