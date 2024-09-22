@@ -72,7 +72,9 @@ public class Client {
                 command.run();  // Execute the corresponding command
             }
 
-            // Break if needed after game start or other conditions
+            if (serverMessage.equals("END_INIT")) {
+                break;
+            }
         }
     }
 
