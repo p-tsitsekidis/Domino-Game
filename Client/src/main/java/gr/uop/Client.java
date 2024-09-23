@@ -14,7 +14,18 @@ public class Client {
     private PrintWriter toServer;
     private Scanner fromServer;
     private Scanner userInput;
+
+    // Variables needed to store information from the server
     private String playerName;
+    private String opponentName;
+    private String winner;
+    private String tiles;
+    private String lineOfPlay;
+    private String tile;
+    private String score;
+    private String index;
+
+    private String data; // Any data received from the server
 
     // HashMaps for command handling
     private Map<String, Runnable> initCommands = new HashMap<>();
@@ -57,14 +68,35 @@ public class Client {
         initCommands.put("WAIT_PLAYER1_NAME", this::handlePlayer1Name);
         initCommands.put("WAIT_PLAYER2_NAME", this::handlePlayer2Name);
         initCommands.put("NAME_REQUEST", this::handleNameRequest);
-        initCommands.put("END_INIT", () -> handleEndInit(playerName));
+        initCommands.put("END_INIT", () -> handleEndInit(playerName, data));
 
         // Gameplay phase
+        gameCommands.put("TURN", () -> handleTurn(playerName));
+        gameCommands.put("TILES", () -> handleTiles(data));
+        gameCommands.put("BOARD", () -> handleLineOfPlay(data));
+        gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
+        gameCommands.put("NO_AVAILABLE_MOVES", this::handleNoAvailableMoves);
+        gameCommands.put("DRAW", () -> handleDraw(data));
+        gameCommands.put("OPPONENT_DRAW", this::handleOppDraw);
+        gameCommands.put("PLAYED", () -> handlePlayed(data));
+        gameCommands.put("OPP_PLAYED", () -> handleOppPlayed(data));
+        gameCommands.put("PASS", this::handlePass);
+        gameCommands.put("OPP_PASS", this::handleOppPass);
+        gameCommands.put("INDEX", this::handleIndex);
+        gameCommands.put("INVALID_MOVE", this::handleInvalidMove);
+        gameCommands.put("INVALID_INPUT", this::handleInvalidInput);
+        gameCommands.put("GAME_OVER", () -> handleGameOver(data));
+        gameCommands.put("SCORE", () -> handleScore(data));
     }
 
     private void handleInitialization() {
         while (fromServer.hasNextLine()) {
             String serverMessage = fromServer.nextLine();
+
+            if(serverMessage.contains(" ")) {
+                data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
+                serverMessage = serverMessage.substring(0, serverMessage.indexOf(" "));
+            }
 
             // Look up the command in the initCommands map
             Runnable command = initCommands.get(serverMessage);
@@ -79,7 +111,24 @@ public class Client {
     }
 
     private void handleGameLoop() {
+        while (fromServer.hasNextLine()) {
+            String serverMessage = fromServer.nextLine();
 
+            if(serverMessage.contains(" ")) {
+                data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
+                serverMessage = serverMessage.substring(0, serverMessage.indexOf(" "));
+            }
+
+            // Look up the command in the gameCommands map
+            Runnable command = gameCommands.get(serverMessage);
+            if (command != null) {
+                command.run();
+            }
+
+            if (serverMessage.equals("SCORE")) {
+                break;
+            }
+        }
     }
 
     private void closeConnections() {
@@ -94,6 +143,7 @@ public class Client {
     }
 
     // ------------------------------------ SERVER HANDLES -------------------------------------------
+    // ------------------------------------ INIT HANDLES -------------------------------------------
     private void handleWaitConnect() {
         System.out.println("Waiting for Player 2 to connect...");
     }
@@ -116,7 +166,85 @@ public class Client {
         toServer.println(playerName);
     }
 
-    private void handleEndInit(String playerName) {
-        System.out.println("Hello " + playerName + "! The game is starting...");
+    private void handleEndInit(String playerName, String data) {
+        opponentName = data;
+        System.out.println("Hello " + playerName + "!");
+        System.out.println("Your opponent is: " + opponentName + "!");
+        System.out.println("The game is starting...");
+    }
+
+    // ------------------------------------ GAMEPLAY HANDLES -------------------------------------------
+    private void handleTurn(String playerName) {
+        System.out.println("It's your turn " + playerName + "!");
+    }
+
+    private void handleTiles(String data) {
+        tiles = data;
+        System.out.println("Your tiles: " + tiles);
+    }
+
+    private void handleLineOfPlay(String data) {
+        lineOfPlay = data;
+        System.out.println("Current Board: " + lineOfPlay);
+    }
+
+    private void handleWaitForMove() {
+        System.out.println("Waiting for " + opponentName + " to make a move.");
+    }
+
+    private void handleNoAvailableMoves() {
+        System.out.println("No available moves. Drawing from stock...");
+    }
+
+    private void handleDraw(String data) {
+        tile = data;
+        System.out.println("You drew: " + tile);
+    }
+
+    private void handleOppDraw() {
+        System.out.println(opponentName + " drew a tile.");
+    }
+
+    private void handlePlayed(String data) {
+        tile = data;
+        System.out.println("You played: " + tile);
+    }
+
+    private void handleOppPlayed(String data) {
+        tile = data;
+        System.out.println(opponentName + " played: " + tile);
+    }
+
+    private void handlePass() {
+        System.out.println("No valid tiles to play and no more tiles in the stock. Passing turn.");
+    }
+
+    private void handleOppPass() {
+        System.out.println(opponentName + " has no valid tiles to play and the stock is empty.");
+        System.out.println(opponentName + " passed the turn.");
+    }
+
+    private void handleIndex() {
+        System.out.println("Enter the index of the tile you want to play: ");
+        index = userInput.nextLine();
+        toServer.println(index);
+    }
+
+    private void handleInvalidMove() {
+        System.out.println("Invalid move. Choose a different tile.");
+    }
+
+    private void handleInvalidInput() {
+        System.out.println("Invalid input or tile index. Try again.");
+    }
+
+    private void handleGameOver(String data) {
+        winner = data;
+        System.out.println("\nGame over! The winner is: " + winner + "!");
+    }
+
+    private void handleScore(String data) {
+        score = data;
+        System.out.println("You scored: " + score + " points!");
     }
 }
