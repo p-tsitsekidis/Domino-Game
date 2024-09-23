@@ -121,10 +121,11 @@ public class DominoServer {
                 if (gameEngine.isGameOver()) {
                     gameOver = true;
                     Player winner = gameEngine.getWinner();
+                    Player opponent = (player1Name.equals(winner.getName()) ? player2 : player1);
                     toCurrentPlayer.println("GAME_OVER " + winner.getName());
                     toCurrentPlayer.println("SCORE " + currentPlayer.getScore());
                     toOtherPlayer.println("GAME_OVER " + winner.getName());
-                    toOtherPlayer.println("SCORE " + player2.getScore());
+                    toOtherPlayer.println("SCORE " + opponent.getScore());
                 }
             }
 
