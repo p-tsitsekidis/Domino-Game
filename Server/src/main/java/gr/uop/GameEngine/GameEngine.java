@@ -126,9 +126,9 @@ public class GameEngine {
         }
     }
 
-    private void calculateFinalScore(Player winner, Player loser) {
-        int loserHandSum = calculateHandSum(loser);
-        winner.updateScore(loserHandSum);
+    private void calculateFinalScore(Player winner, Player opponent) {
+        int opponentHandSum = calculateHandSum(opponent);
+        winner.updateScore(opponentHandSum);
     }
 
     private int calculateHandSum(Player player) {
