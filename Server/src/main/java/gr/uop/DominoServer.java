@@ -28,22 +28,22 @@ public class DominoServer {
             System.out.println("Player 1 connected.");
             Scanner fromPlayer1 = new Scanner(player1Socket.getInputStream());
             PrintWriter toPlayer1 = new PrintWriter(player1Socket.getOutputStream(), true);
-            toPlayer1.println("Waiting for Player 2 to connect...");
+            toPlayer1.println("WAIT_CONNECT");
 
             //Player 2 initialize
             System.out.println("Waiting for Player 2 to connect...");
             Socket player2Socket = serverSocket.accept();
             System.out.println("Player 2 connected.");
-            toPlayer1.println("Player 2 connected");
+            toPlayer1.println("CONNECTED");
             Scanner fromPlayer2 = new Scanner(player2Socket.getInputStream());
             PrintWriter toPlayer2 = new PrintWriter(player2Socket.getOutputStream(), true);
-            toPlayer2.println("Waiting for Player 1 to enter their name...");
+            toPlayer2.println("WAIT_PLAYER1_NAME");
 
             //Get player names from the clients
-            toPlayer1.println("Please enter your name:");
+            toPlayer1.println("NAME_REQUEST");
             String player1Name = fromPlayer1.nextLine();
-            toPlayer1.println("Waiting for Player 2 to enter their name...");
-            toPlayer2.println("Please enter your name:");
+            toPlayer1.println("WAIT_PLAYER2_NAME");
+            toPlayer2.println("NAME_REQUEST");
             String player2Name = fromPlayer2.nextLine();
 
             //Initialize GameEngine
@@ -51,8 +51,8 @@ public class DominoServer {
             Player player1 = gameEngine.getPlayer1();
             Player player2 = gameEngine.getPlayer2();
 
-            toPlayer1.println("Hello " + player1Name + "! The game is starting...");
-            toPlayer2.println("Hello " + player2Name + "! The game is starting...");
+            toPlayer1.println("END_INIT " + player2Name);
+            toPlayer2.println("END_INIT " + player1Name);
 
             //Main game loop
             boolean gameOver = false;
@@ -63,12 +63,12 @@ public class DominoServer {
                 PrintWriter toOtherPlayer = (currentPlayer == player1) ? toPlayer2 : toPlayer1;
 
                 //Game state
-                toCurrentPlayer.println("\nIt's your turn, " + currentPlayer.getName() + "!");
-                toCurrentPlayer.println("Your tiles: " + currentPlayer.getTiles());
-                toCurrentPlayer.println("Current board: " + gameEngine.getLineOfPlay());
+                toCurrentPlayer.println("TURN");
+                toCurrentPlayer.println("TILES " + currentPlayer.getTiles());
+                toCurrentPlayer.println("BOARD " + gameEngine.getLineOfPlay());
 
-                toOtherPlayer.println("\nWaiting for " + currentPlayer.getName() + " to make a move...");
-                toOtherPlayer.println("Current board: " + gameEngine.getLineOfPlay());
+                toOtherPlayer.println("WAIT_OPPONENT_MOVE");
+                toOtherPlayer.println("BOARD " + gameEngine.getLineOfPlay());
 
                 boolean validMove = false;
 
@@ -76,28 +76,28 @@ public class DominoServer {
                 while (!validMove && !gameEngine.isGameOver()) {
                     if (!gameEngine.canPlay()) {
                         //Automatically draw a tile if no valid moves exist
-                        toCurrentPlayer.println("No available moves. Drawing from stock...");
+                        toCurrentPlayer.println("NO_AVAILABLE_MOVES");
                         while (!validMove && gameEngine.drawTile()) {
                             Tile drawnTile = currentPlayer.getTiles().get(currentPlayer.getTiles().size() - 1);
-                            toCurrentPlayer.println("You drew: " + drawnTile);
-                            toOtherPlayer.println(currentPlayer.getName() + " drew a tile.");
+                            toCurrentPlayer.println("DRAW " + drawnTile);
+                            toOtherPlayer.println("OPPONENT_DRAW");
 
                             validMove = gameEngine.playTile(drawnTile);
                             if (validMove) {
-                                toCurrentPlayer.println("You played: " + drawnTile);
-                                toOtherPlayer.println(currentPlayer.getName() + " played: " + drawnTile);
+                                toCurrentPlayer.println("PLAYED " + drawnTile);
+                                toOtherPlayer.println("OPP_PLAYED " + drawnTile);
                             }
                         }
 
                         //Stock empty and no valid move condition
                         if (!validMove) {
-                            toCurrentPlayer.println("No valid tiles to draw and no more tiles in the stock. Passing turn.");
-                            toOtherPlayer.println(currentPlayer.getName() + " has no valid tiles and no more tiles in the stock. Passing turn.");
+                            toCurrentPlayer.println("PASS");
+                            toOtherPlayer.println("OPP_PASS");
                             break;
                         }
                     } else {
                         //Player moves
-                        toCurrentPlayer.println("Enter the index of the tile you want to play:");
+                        toCurrentPlayer.println("INDEX");
                         String input = fromCurrentPlayer.nextLine();
 
                         try {
@@ -106,13 +106,13 @@ public class DominoServer {
 
                             validMove = gameEngine.playTile(chosenTile);
                             if (validMove) {
-                                toCurrentPlayer.println("You played: " + chosenTile);
-                                toOtherPlayer.println(currentPlayer.getName() + " played: " + chosenTile);
+                                toCurrentPlayer.println("PLAYED " + chosenTile);
+                                toOtherPlayer.println("OPP_PLAYED " + chosenTile);
                             } else {
-                                toCurrentPlayer.println("Invalid move with selected tile. Try again.");
+                                toCurrentPlayer.println("INVALID_MOVE");
                             }
                         } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                            toCurrentPlayer.println("Invalid input or tile index. Try again.");
+                            toCurrentPlayer.println("INVALID_INPUT");
                         }
                     }
                 }
@@ -121,10 +121,10 @@ public class DominoServer {
                 if (gameEngine.isGameOver()) {
                     gameOver = true;
                     Player winner = gameEngine.getWinner();
-                    toCurrentPlayer.println("\nGame over! The winner is: " + winner.getName());
-                    toCurrentPlayer.println("\nYou scored: " + currentPlayer.getScore() + " points!");
-                    toOtherPlayer.println("\nGame over! The winner is: " + winner.getName());
-                    toOtherPlayer.println("\nYou scored: " + player2.getScore() + " points!");
+                    toCurrentPlayer.println("GAME_OVER " + winner.getName());
+                    toCurrentPlayer.println("SCORE " + currentPlayer.getScore());
+                    toOtherPlayer.println("GAME_OVER " + winner.getName());
+                    toOtherPlayer.println("SCORE " + player2.getScore());
                 }
             }
 
