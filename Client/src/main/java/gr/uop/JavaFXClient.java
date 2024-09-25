@@ -25,7 +25,6 @@ public class JavaFXClient extends Application {
     private void showInitializationScreen() {
         // Pass a callback function that gets called when initialization is complete
         new InitializationScreen(primaryStage, (result) -> {
-            System.out.println("Initialization complete, transitioning to gameplay screen..."); // Debugging
             // Save the results from initialization
             this.playerName = result.playerName;
             this.opponentName = result.opponentName;
@@ -39,7 +38,6 @@ public class JavaFXClient extends Application {
     }
 
     private void showGameplayScreen() {
-        System.out.println("Transitioning to gameplay screen..."); // Debugging
         // Set up the gameplay screen using the same primary stage
         GameplayScreen gameScreen = new GameplayScreen(primaryStage, socket, playerName, opponentName, toServer, fromServer);
         gameScreen.start();
