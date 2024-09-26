@@ -1,7 +1,10 @@
 package gr.uop;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -32,15 +35,30 @@ public class JavaFXClient extends Application {
             this.toServer = result.toServer;
             this.fromServer = result.fromServer;
 
-            // Now transition to the gameplay screen in the same stage
             showGameplayScreen();
         });
     }
 
     private void showGameplayScreen() {
         // Set up the gameplay screen using the same primary stage
-        GameplayScreen gameScreen = new GameplayScreen(primaryStage, socket, playerName, opponentName, toServer, fromServer);
+        GameplayScreen gameScreen = new GameplayScreen(primaryStage, socket, playerName, opponentName, toServer, fromServer, this::shutdownGame);
         gameScreen.start();
+    }
+
+    private void shutdownGame() {
+        System.out.println("Shutting down game...");
+        closeConnections();
+        Platform.exit();
+    }
+
+    private void closeConnections() {
+        try {
+            if (toServer != null) toServer.close();
+            if (fromServer != null) fromServer.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
