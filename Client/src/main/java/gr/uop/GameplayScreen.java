@@ -1,5 +1,6 @@
 package gr.uop;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -95,15 +96,20 @@ public class GameplayScreen {
                 serverMessage = serverMessage.substring(0, serverMessage.indexOf(" "));
             }
 
-            // Look up the command in the gameCommands map
-            Runnable command = gameCommands.get(serverMessage);
-            if (command != null) {
-                command.run();
-            }
+            final String finalServerMessage = serverMessage;
+            Platform.runLater(() -> processServerMessage(finalServerMessage));
 
             if (serverMessage.equals("SCORE")) {
                 break;
             }
+        }
+    }
+
+    private void processServerMessage(String serverMessage) {
+        // Look up the command in the gameCommands map
+        Runnable command = gameCommands.get(serverMessage);
+        if (command != null) {
+            command.run();
         }
     }
 
