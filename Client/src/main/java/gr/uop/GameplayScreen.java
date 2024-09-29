@@ -56,7 +56,7 @@ public class GameplayScreen {
     }
 
     private void initializeCommandMaps() {
-        gameCommands.put("TURN", () -> handleTurn(playerName));
+        gameCommands.put("TURN", this::handleTurn);
         gameCommands.put("TILES", () -> handleTiles(data));
         gameCommands.put("BOARD", () -> handleLineOfPlay(data));
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
@@ -114,7 +114,7 @@ public class GameplayScreen {
     }
 
     // ------------------------------------------ GAMEPLAY HANDLES ---------------------------------------
-    private void handleTurn(String playerName) {
+    private void handleTurn() {
         System.out.println("It's your turn " + playerName + "!");
     }
 
