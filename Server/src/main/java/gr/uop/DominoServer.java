@@ -58,17 +58,25 @@ public class DominoServer {
             boolean gameOver = false;
             while (!gameOver) {
                 Player currentPlayer = gameEngine.getCurrentPlayer();
+
                 Scanner fromCurrentPlayer = (currentPlayer == player1) ? fromPlayer1 : fromPlayer2;
                 PrintWriter toCurrentPlayer = (currentPlayer == player1) ? toPlayer1 : toPlayer2;
                 PrintWriter toOtherPlayer = (currentPlayer == player1) ? toPlayer2 : toPlayer1;
 
                 //Game state
                 toCurrentPlayer.println("TURN");
+                
                 toCurrentPlayer.println("TILES " + currentPlayer.getTiles());
                 toCurrentPlayer.println("BOARD " + gameEngine.getLineOfPlay());
-
-                toOtherPlayer.println("WAIT_OPPONENT_MOVE");
+                
+                if (currentPlayer.equals(player1)) {
+                    toOtherPlayer.println("TILES " + player2.getTiles());
+                } else {
+                    toOtherPlayer.println("TILES " + player1.getTiles());
+                }
+                
                 toOtherPlayer.println("BOARD " + gameEngine.getLineOfPlay());
+                toOtherPlayer.println("WAIT_OPPONENT_MOVE");
 
                 boolean validMove = false;
 
