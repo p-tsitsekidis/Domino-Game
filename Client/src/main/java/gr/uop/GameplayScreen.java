@@ -173,7 +173,7 @@ public class GameplayScreen {
                 else if (serverMessage.contains("TILES"))
                     this.tiles = serverMessage.substring(serverMessage.indexOf(" ") + 1);
 
-                    else
+                else
                     this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                     
                 System.out.println("LOOP: " + this.tiles);
@@ -210,6 +210,9 @@ public class GameplayScreen {
         player2HBoxRectangles.getChildren().clear();
         // this.player1Plates.clear();
 
+        HBox player1HBoxRectangles2 = new HBox(8);
+        HBox player2HBoxRectangles2 = new HBox(8);
+
         System.out.println("before AAAAAA | " + tiles);
     
         this.tiles = this.tiles.replace("[", "").replace("]", "").trim();
@@ -231,13 +234,12 @@ public class GameplayScreen {
 
             Platform.runLater(() -> {
                 plate_hBox.getChildren().add(plate);
-                player1HBoxRectangles.getChildren().add(plate_hBox);
+                player1HBoxRectangles2.getChildren().add(plate_hBox);
+                this.player1HBoxRectangles = player1HBoxRectangles2;
             });
         }
         
         Platform.runLater(() -> {
-            // if (player1Fix.getChildren().size() == 0)
-            //     player1Fix.getChildren().addAll(player1Label, player1HBoxRectangles);
             if (player1Fix.getChildren().size() == 2)
                 player1Fix.getChildren().set(1, player1HBoxRectangles);
 
@@ -252,13 +254,12 @@ public class GameplayScreen {
     
             Platform.runLater(() -> {
                 plate_hBox.getChildren().add(plate);
-                player2HBoxRectangles.getChildren().add(plate_hBox);
+                player2HBoxRectangles2.getChildren().add(plate_hBox);
+                this.player2HBoxRectangles = player2HBoxRectangles2;
             });
         }
         
         Platform.runLater(() -> {
-            // if (player2Fix.getChildren().size() == 0)
-            //     player2Fix.getChildren().addAll(player2Label, player2HBoxRectangles);
             if (player2Fix.getChildren().size() == 2)
                 player2Fix.getChildren().set(1, player2HBoxRectangles);
 
