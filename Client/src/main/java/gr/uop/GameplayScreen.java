@@ -83,18 +83,12 @@ public class GameplayScreen {
     public void start() {
         initializeCommandMaps();
         setupUI();
-        // requestInitialTiles();
         new Thread(this::handleGameLoop).start();
     }
-
-    // private void requestInitialTiles() {
-    //     toServer.println("GET_INITIAL_TILES");
-    // }
 
     private void initializeCommandMaps() {
         gameCommands.put("TURN", this::handleTurn);
         gameCommands.put("TILES", () -> handleTiles());
-        // gameCommands.put("TILES_OPP", this::handleOppTiles);
         gameCommands.put("BOARD", () -> handleLineOfPlay());
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
         gameCommands.put("NO_AVAILABLE_MOVES", this::handleNoAvailableMoves);
@@ -172,7 +166,6 @@ public class GameplayScreen {
                     this.lineOfPlay = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                 else if (serverMessage.contains("TILES"))
                     this.tiles = serverMessage.substring(serverMessage.indexOf(" ") + 1);
-
                 else
                     this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                     
@@ -206,29 +199,23 @@ public class GameplayScreen {
     }
 
     private void handleTiles() {
-        player1HBoxRectangles.getChildren().clear();
-        player2HBoxRectangles.getChildren().clear();
-        // this.player1Plates.clear();
+        this.player1HBoxRectangles.getChildren().clear();
+        this.player2HBoxRectangles.getChildren().clear();
 
         HBox player1HBoxRectangles2 = new HBox(8);
         HBox player2HBoxRectangles2 = new HBox(8);
 
-        System.out.println("before AAAAAA | " + tiles);
-    
         this.tiles = this.tiles.replace("[", "").replace("]", "").trim();
         String[] pairs2 = this.tiles.split(", ");
     
         player1Label.setText(playerName + " (Tiles: " + pairs2.length + ")");
 
-        System.out.println("after AAAAAA " + pairs2.length + " | " + tiles);
-        
         for (int i = 0; i < pairs2.length; i++) {
             String tile = pairs2[i].trim();
             String[] numbers = tile.split(":");
     
             HBox plate_hBox = new HBox(20);
-            String new_i = "" + i + "";
-            StackPane plate = createDominoPlate(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]), "PLAYER1", new_i);
+            StackPane plate = createDominoPlate(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]), "PLAYER1", "" + i + "");
     
             this.player1Plates.add(plate);
 
@@ -242,11 +229,14 @@ public class GameplayScreen {
         Platform.runLater(() -> {
             if (player1Fix.getChildren().size() == 2)
                 player1Fix.getChildren().set(1, player1HBoxRectangles);
+                
+            this.gameLayout.setTop(player1Info);
 
-            gameLayout.setTop(player1Info);
+            this.primaryStage.setMinHeight(Math.max(this.primaryStage.getMinHeight(), calculatePlayerHeight(player1HBoxRectangles)));
+            this.primaryStage.setMinWidth(Math.max(this.primaryStage.getMinWidth(), calculatePlayerWidth(player1HBoxRectangles)));
         });
     
-        player2Label.setText(opponentName + " (Tiles: " + this.opp_tiles_size + ")");
+        this.player2Label.setText(opponentName + " (Tiles: " + this.opp_tiles_size + ")");
         
         for (int i = 1; i <= this.opp_tiles_size; i++) {
             HBox plate_hBox = new HBox(20);
@@ -263,8 +253,12 @@ public class GameplayScreen {
             if (player2Fix.getChildren().size() == 2)
                 player2Fix.getChildren().set(1, player2HBoxRectangles);
 
-            gameLayout.setBottom(player2Info);
+            this.gameLayout.setBottom(player2Info);
+
+            this.primaryStage.setMinHeight(Math.max(this.primaryStage.getMinHeight(), calculatePlayerHeight(player2HBoxRectangles)));
+            this.primaryStage.setMinWidth(Math.max(this.primaryStage.getMinWidth(), calculatePlayerWidth(player2HBoxRectangles)));
         });
+
 
         updatePlateColors();
     }    
@@ -278,14 +272,14 @@ public class GameplayScreen {
             
             for (String pair : pairs) {
                 String[] values = pair.split(":");
-                // int firstValue = Integer.parseInt(values[0]);
-                // int secondValue = Integer.parseInt(values[1]);
-                // System.out.println("First: " + firstValue + ", Second: " + secondValue);
                 
                 StackPane plate = createDominoPlateForLineOfPlay(Integer.parseInt(values[0]), Integer.parseInt(values[1]));
                 
                 this.JavaFXlineOfPlay.getChildren().add(plate);
             }
+
+            double lineOfPlayWidth = calculateLineOfPlayWidth();
+            this.primaryStage.setMinWidth(lineOfPlayWidth);
 
             System.out.println("Current Board: " + this.lineOfPlay);
         }
@@ -300,7 +294,7 @@ public class GameplayScreen {
     private void handleNoAvailableMoves() {
         System.out.println("No available moves. Drawing from stock...");
     }
-
+    
     private void handleDraw(String data) {
         // tile = data;
         // handleTiles();
@@ -309,25 +303,20 @@ public class GameplayScreen {
 
     private void handleOppDraw() {
         this.opp_tiles_size++;    
-        // handleTiles();
         System.out.println(opponentName + " drew a tile.");
     }
-
+    
     private void handlePlayed(String data) {
         tile = data;
 
         this.your_turn = false;
-        
         System.out.println("You played: " + tile);
     }
 
     private void handleOppPlayed(String data) {
         tile = data;
-
         this.your_turn = true;
-
         this.opp_tiles_size--;
-
         System.out.println(opponentName + " played: " + tile);
     }
 
@@ -345,6 +334,7 @@ public class GameplayScreen {
         // index = userInput.nextLine();
         // toServer.println(index);
     }
+
 
     private void handleInvalidMove() {
         System.out.println("Invalid move. Choose a different tile.");
@@ -367,7 +357,42 @@ public class GameplayScreen {
 
     // ----------------------- JAVA FX FUNCTIONS ---------------------------------
 
+    private double calculatePlayerHeight(HBox playerHBox) {
+        return playerHBox.getChildren().size() > 0 ? 200 * 2 : 0;
+    }
+
+    private double calculatePlayerWidth(HBox playerHBox) {
+        return playerHBox.getChildren().size() * 60 + (playerHBox.getChildren().size() - 1) * 20;
+    }
+
+    private double calculateLineOfPlayWidth() {
+        double totalWidth = 0;
+        int numberOfTiles = this.JavaFXlineOfPlay.getChildren().size();
+        totalWidth = (numberOfTiles * 69) + ((numberOfTiles - 1) * 6);
+    
+        return totalWidth;
+    }
+
     private StackPane createDominoPlate(int leftNumber, int rightNumber, String type, String index) {
+        StackPane stackPanePlate = createRectangle(leftNumber, rightNumber, index);
+        
+        if (type.equals("PLAYER1") && your_turn) {
+            stackPanePlate.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                String plateIndex = (String) stackPanePlate.getUserData();
+                toServer.println(plateIndex);
+            });
+        }
+
+        if (type.equals("PLAYER2")) stackPanePlate.setDisable(true);
+
+        return stackPanePlate;
+    }
+
+    private StackPane createDominoPlateForLineOfPlay(int leftNumber, int rightNumber) {
+        return createRectangle(leftNumber, rightNumber, " ");
+    }
+
+    private StackPane createRectangle(int leftNumber, int rightNumber, String index) {
         Rectangle rectangle = new Rectangle(60, 70, Color.BLACK);
         rectangle.setArcWidth(20);
         rectangle.setArcHeight(20);
@@ -385,53 +410,11 @@ public class GameplayScreen {
         
         StackPane stackPanePlate = new StackPane();
         stackPanePlate.getChildren().addAll(rectangle, circles_hBox);
-        
-        stackPanePlate.setUserData(index);
 
-        if (type.equals("PLAYER1") && your_turn) {
-            stackPanePlate.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                String plateIndex = (String) stackPanePlate.getUserData();
-                toServer.println(plateIndex);
-            });
-        }
-
-        if (type.equals("PLAYER2")) stackPanePlate.setDisable(true);
-
-        // stackPaneEventHandlers(stackPanePlate, rectangle);
+        if (index != " ") stackPanePlate.setUserData(index);
 
         return stackPanePlate;
     }
-
-    private StackPane createDominoPlateForLineOfPlay(int leftNumber, int rightNumber) {
-        Rectangle rectangle = new Rectangle(60, 70, Color.BLACK);
-        rectangle.setArcWidth(20);
-        rectangle.setArcHeight(20);
-
-        Line line = new Line(100, 0, 100, 50);
-        line.setStroke(Color.WHITE);
- 
-        VBox leftPane = createCirclePane(leftNumber);
-        VBox rightPane = createCirclePane(rightNumber);
-
-        HBox circles_hBox = new HBox();
-        circles_hBox.setAlignment(Pos.CENTER);
-        circles_hBox.getChildren().addAll(leftPane, line, rightPane);
-        
-        StackPane stackPanePlate = new StackPane();
-        stackPanePlate.getChildren().addAll(rectangle, circles_hBox);
-        
-        return stackPanePlate;
-    }
-
-    // private void stackPaneEventHandlers(StackPane stackPanePlate, Rectangle rectangle) {
-    //     stackPanePlate.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-    //         rectangle.setFill(Color.DARKGRAY);
-    //     });
-    
-    //     stackPanePlate.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
-    //         rectangle.setFill(Color.BLACK);
-    //     });
-    // }
 
     private VBox createCirclePane(int number) {
         VBox pane = new VBox();
