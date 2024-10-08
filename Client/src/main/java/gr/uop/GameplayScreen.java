@@ -1,5 +1,6 @@
 package gr.uop;
 
+import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.FillTransition;
 import javafx.animation.ScaleTransition;
@@ -42,6 +43,7 @@ public class GameplayScreen {
     private String lineOfPlay;
     private String tile;
     private String score;
+    private String stock_size;
     private int index;
     
     private String data; // Any data received from the server
@@ -53,6 +55,8 @@ public class GameplayScreen {
     private Runnable onGameShutdown; // Signals the end of the game
     
     // JavaFX items
+    private Label turnMessageLabel;
+    
     private List<StackPane> player1Plates;
     private boolean your_turn;
     private BorderPane gameLayout;
@@ -64,11 +68,14 @@ public class GameplayScreen {
     private VBox player1Fix;
     private HBox player1Info;
 
+
     private int opp_tiles_size;
     private HBox player2Info;
     private HBox player2HBoxRectangles;
     private VBox player2Fix;
     private Label player2Label;
+
+    private Label VBox_stock;
     
     public GameplayScreen(Stage primaryStage, Socket socket, String playerName, String opponentName, PrintWriter toServer, Scanner fromServer, Runnable onGameShutdown) {
         this.primaryStage = primaryStage;
@@ -90,6 +97,7 @@ public class GameplayScreen {
         gameCommands.put("TURN", this::handleTurn);
         gameCommands.put("TILES", () -> handleTiles());
         gameCommands.put("BOARD", () -> handleLineOfPlay());
+        gameCommands.put("STOCK_SIZE", () -> handleStock());
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
         gameCommands.put("NO_AVAILABLE_MOVES", this::handleNoAvailableMoves);
         gameCommands.put("DRAW", () -> handleDraw(data));
@@ -119,7 +127,11 @@ public class GameplayScreen {
     private void startGameScreen() {
         this.gameLayout = new BorderPane();
 
+        // this.gameLayout.setCenter(new Label("elaaaaaa"));
+
         this.player1Label = new Label();
+        this.player1Label.setStyle("-fx-font-size: 17px;");
+
         this.player1Info = new HBox(10);
         this.player1Info.setAlignment(Pos.CENTER);
         
@@ -132,6 +144,8 @@ public class GameplayScreen {
         // ---------------------------------------------------------------------------------
 
         this.player2Label = new Label();
+        this.player2Label.setStyle("-fx-font-size: 17px;");
+
         this.player2Info = new HBox(10);
         this.player2Info.setAlignment(Pos.CENTER);
         
@@ -142,18 +156,31 @@ public class GameplayScreen {
         this.player2Fix.setAlignment(Pos.CENTER);
         
         this.JavaFXlineOfPlay = new HBox(6);
-        this.gameLayout.setLeft(this.JavaFXlineOfPlay);
+        
+        this.turnMessageLabel = new Label();
+        this.turnMessageLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: green;");
 
+        VBox lineOfPlayContainer = new VBox();
+        lineOfPlayContainer.setAlignment(Pos.CENTER);
+        lineOfPlayContainer.getChildren().addAll(turnMessageLabel, JavaFXlineOfPlay);
+        this.gameLayout.setCenter(lineOfPlayContainer);
+        
         this.player1Info.getChildren().add(this.player1Fix);
         this.player2Info.getChildren().add(this.player2Fix);
+        
+        this.VBox_stock = new Label();
+        this.VBox_stock.setStyle("-fx-font-size: 13px;");
 
-        this.player1Fix.getChildren().addAll(player1Label, player1HBoxRectangles);
+        this.player1Fix.getChildren().addAll(player1Label, VBox_stock, player1HBoxRectangles);
         this.player2Fix.getChildren().addAll(player2Label, player2HBoxRectangles);
 
         this.player_tiles_size = 7;
         this.opp_tiles_size = 7;
         this.your_turn = false;
         this.player1Plates = new ArrayList<>();
+
+        // this.player1Fix.getChildren()
+        // this.gameLayout.setRight(VBox_stock);
     }
 
     private void handleGameLoop() {
@@ -166,6 +193,8 @@ public class GameplayScreen {
                     this.lineOfPlay = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                 else if (serverMessage.contains("TILES"))
                     this.tiles = serverMessage.substring(serverMessage.indexOf(" ") + 1);
+                else if (serverMessage.contains("STOCK_SIZE"))
+                    this.stock_size = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                 else
                     this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                     
@@ -195,7 +224,21 @@ public class GameplayScreen {
     private void handleTurn() {
         this.your_turn = true;
         // gameLayout.setStyle("-fx-background-color: lightgreen;");
-        System.out.println("It's your turn " + playerName + "!");
+        this.turnMessageLabel.setText("It's your turn!");
+        System.out.println("It's your turn [" + playerName + "]!");
+    }
+
+    private void handleStock() {
+        int size = Integer.parseInt(this.stock_size);
+
+        VBox_stock.setText("Stock: " + size);
+
+        // VBox_stock.getChildren().clear();
+
+        // for (int i = 0; i < size; i++) {
+        //     StackPane plate = createDominoPlate(0, 0, "PLAYER2", "" + -1 + "");
+        //     VBox_stock.getChildren().add(plate);
+        // }
     }
 
     private void handleTiles() {
@@ -227,8 +270,8 @@ public class GameplayScreen {
         }
         
         Platform.runLater(() -> {
-            if (player1Fix.getChildren().size() == 2)
-                player1Fix.getChildren().set(1, player1HBoxRectangles);
+            if (player1Fix.getChildren().size() == 3)
+                player1Fix.getChildren().set(2, player1HBoxRectangles);
                 
             this.gameLayout.setTop(player1Info);
 
@@ -288,7 +331,8 @@ public class GameplayScreen {
     private void handleWaitForMove() {
         // gameLayout.setStyle("-fx-background-color: red;");
         updatePlateColors();
-        System.out.println("Waiting for " + opponentName + " to make a move.");
+        this.turnMessageLabel.setText("Waiting for [" + this.opponentName + "] to make a move.");
+        System.out.println("Waiting for [" + this.opponentName + "] to make a move.");
     }
     
     private void handleNoAvailableMoves() {
@@ -381,6 +425,15 @@ public class GameplayScreen {
                 String plateIndex = (String) stackPanePlate.getUserData();
                 toServer.println(plateIndex);
             });
+
+            ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(300), stackPanePlate);
+            scaleTransition.setFromX(1.0);
+            scaleTransition.setFromY(1.0);
+            scaleTransition.setToX(1.05);
+            scaleTransition.setToY(1.05);
+            scaleTransition.setCycleCount(Animation.INDEFINITE);
+            scaleTransition.setAutoReverse(true);
+            scaleTransition.play();
         }
 
         if (type.equals("PLAYER2")) stackPanePlate.setDisable(true);
@@ -398,15 +451,21 @@ public class GameplayScreen {
         rectangle.setArcHeight(20);
         // rectangle.setStroke(Color.BLACK);
 
-        Line line = new Line(100, 0, 100, 50);
-        line.setStroke(Color.WHITE);
- 
         VBox leftPane = createCirclePane(leftNumber);
         VBox rightPane = createCirclePane(rightNumber);
-
+        
         HBox circles_hBox = new HBox();
         circles_hBox.setAlignment(Pos.CENTER);
-        circles_hBox.getChildren().addAll(leftPane, line, rightPane);
+
+        
+        if (!index.equals("-1")) {
+            Line line = new Line(100, 0, 100, 50);
+            line.setStroke(Color.WHITE);
+         
+            circles_hBox.getChildren().addAll(leftPane, line, rightPane);
+        } else {
+            circles_hBox.getChildren().addAll(leftPane, rightPane);
+        }
         
         StackPane stackPanePlate = new StackPane();
         stackPanePlate.getChildren().addAll(rectangle, circles_hBox);
