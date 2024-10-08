@@ -66,9 +66,11 @@ public class DominoServer {
                 //Game state
                 toCurrentPlayer.println("TURN");
                 
+                toCurrentPlayer.println("STOCK_SIZE " + gameEngine.getStockSize());
                 toCurrentPlayer.println("TILES " + currentPlayer.getTiles());
                 toCurrentPlayer.println("BOARD " + gameEngine.getLineOfPlay());
                 
+                toOtherPlayer.println("STOCK_SIZE " + gameEngine.getStockSize());
                 if (currentPlayer.equals(player1)) {
                     toOtherPlayer.println("TILES " + player2.getTiles());
                 } else {
@@ -106,10 +108,10 @@ public class DominoServer {
                     } else {
                         //Player moves
                         toCurrentPlayer.println("INDEX");
-                        String input = fromCurrentPlayer.nextLine();
+                        int input = fromCurrentPlayer.nextInt();
 
                         try {
-                            int tileIndex = Integer.parseInt(input);
+                            int tileIndex = input;
                             Tile chosenTile = currentPlayer.getTiles().get(tileIndex);
 
                             validMove = gameEngine.playTile(chosenTile);
