@@ -108,10 +108,10 @@ public class DominoServer {
                     } else {
                         //Player moves
                         toCurrentPlayer.println("INDEX");
-                        int input = fromCurrentPlayer.nextInt();
+                        String input = fromCurrentPlayer.nextLine();
 
                         try {
-                            int tileIndex = input;
+                            int tileIndex = Integer.parseInt(input);
                             Tile chosenTile = currentPlayer.getTiles().get(tileIndex);
 
                             validMove = gameEngine.playTile(chosenTile);
