@@ -162,7 +162,11 @@ public class GameEngine {
     
     public Player getPlayer2() {
         return player2;
-    }    
+    }
+
+    public int getStockSize() {
+        return stock.size();
+    }
 
     @Override
     public String toString() {
