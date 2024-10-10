@@ -95,9 +95,9 @@ public class GameplayScreen {
 
     private void initializeCommandMaps() {
         gameCommands.put("TURN", this::handleTurn);
-        gameCommands.put("TILES", () -> handleTiles());
-        gameCommands.put("BOARD", () -> handleLineOfPlay());
-        gameCommands.put("STOCK_SIZE", () -> handleStock());
+        gameCommands.put("TILES", () -> handleTiles(data));
+        gameCommands.put("BOARD", () -> handleLineOfPlay(data));
+        gameCommands.put("STOCK_SIZE", () -> handleStock(data));
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
         gameCommands.put("NO_AVAILABLE_MOVES", this::handleNoAvailableMoves);
         gameCommands.put("DRAW", () -> handleDraw(data));
@@ -219,7 +219,8 @@ public class GameplayScreen {
         System.out.println("It's your turn [" + playerName + "]!");
     }
 
-    private void handleStock() {
+    private void handleStock(String data) {
+        this.stock_size = data;
         int size = Integer.parseInt(this.stock_size);
 
         VBox_stock.setText("Stock: " + size);
@@ -232,7 +233,9 @@ public class GameplayScreen {
         // }
     }
 
-    private void handleTiles() {
+    private void handleTiles(String data) {
+        this.tiles = data;
+
         this.player1HBoxRectangles.getChildren().clear();
         this.player2HBoxRectangles.getChildren().clear();
 
@@ -297,7 +300,9 @@ public class GameplayScreen {
         updatePlateColors();
     }    
 
-    private void handleLineOfPlay() {
+    private void handleLineOfPlay(String data) {
+        this.lineOfPlay = data;
+
         if (!this.lineOfPlay.equals("[]")) {
             this.JavaFXlineOfPlay.getChildren().clear();
             this.lineOfPlay = this.lineOfPlay.replace("[", "").replace("]", "").trim();
