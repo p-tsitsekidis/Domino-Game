@@ -220,24 +220,19 @@ public class GameplayScreen {
     }
 
     private void handleStock(String data) {
-        this.stock_size = data;
-        int size = Integer.parseInt(this.stock_size);
-
-        VBox_stock.setText("Stock: " + size);
-
-        // VBox_stock.getChildren().clear();
-
-        // for (int i = 0; i < size; i++) {
-        //     StackPane plate = createDominoPlate(0, 0, "PLAYER2", "" + -1 + "");
-        //     VBox_stock.getChildren().add(plate);
-        // }
+        stock_size = data;
+        Platform.runLater(() -> {
+            int size = Integer.parseInt(stock_size);
+            VBox_stock.setText("Stock: " + size);
+        });
     }
 
     private void handleTiles(String data) {
-        this.tiles = data;
-
-        this.player1HBoxRectangles.getChildren().clear();
-        this.player2HBoxRectangles.getChildren().clear();
+        tiles = data;
+        Platform.runLater(() -> {
+            this.player1HBoxRectangles.getChildren().clear();
+            this.player2HBoxRectangles.getChildren().clear();
+        });
 
         HBox player1HBoxRectangles2 = new HBox(8);
         HBox player2HBoxRectangles2 = new HBox(8);
@@ -245,7 +240,9 @@ public class GameplayScreen {
         this.tiles = this.tiles.replace("[", "").replace("]", "").trim();
         String[] pairs2 = this.tiles.split(", ");
     
-        player1Label.setText(playerName + " (Tiles: " + pairs2.length + ")");
+        Platform.runLater(() -> {
+            player1Label.setText(playerName + " (Tiles: " + pairs2.length + ")");
+        });
 
         for (int i = 0; i < pairs2.length; i++) {
             String tile = pairs2[i].trim();
@@ -264,7 +261,7 @@ public class GameplayScreen {
         }
         
         Platform.runLater(() -> {
-            if (player1Fix.getChildren().size() == 3)
+            if (player1Fix.getChildren().size() == 4)
                 player1Fix.getChildren().set(2, player1HBoxRectangles);
                 
             this.gameLayout.setTop(player1Info);
@@ -273,7 +270,9 @@ public class GameplayScreen {
             this.primaryStage.setMinWidth(Math.max(this.primaryStage.getMinWidth(), calculatePlayerWidth(player1HBoxRectangles)));
         });
     
-        this.player2Label.setText(opponentName + " (Tiles: " + this.opp_tiles_size + ")");
+        Platform.runLater(() -> {
+            this.player2Label.setText(opponentName + " (Tiles: " + this.opp_tiles_size + ")");
+        });
         
         for (int i = 1; i <= this.opp_tiles_size; i++) {
             HBox plate_hBox = new HBox(20);
@@ -301,10 +300,12 @@ public class GameplayScreen {
     }    
 
     private void handleLineOfPlay(String data) {
-        this.lineOfPlay = data;
-
+        lineOfPlay = data;
         if (!this.lineOfPlay.equals("[]")) {
-            this.JavaFXlineOfPlay.getChildren().clear();
+            Platform.runLater(() -> {
+                this.JavaFXlineOfPlay.getChildren().clear();
+            });
+
             this.lineOfPlay = this.lineOfPlay.replace("[", "").replace("]", "").trim();
             
             String[] pairs = this.lineOfPlay.split(", ");
@@ -314,11 +315,15 @@ public class GameplayScreen {
                 
                 StackPane plate = createDominoPlateForLineOfPlay(Integer.parseInt(values[0]), Integer.parseInt(values[1]));
                 
-                this.JavaFXlineOfPlay.getChildren().add(plate);
+                Platform.runLater(() -> {
+                    this.JavaFXlineOfPlay.getChildren().add(plate);
+                });
             }
 
-            double lineOfPlayWidth = calculateLineOfPlayWidth();
-            this.primaryStage.setMinWidth(lineOfPlayWidth);
+            Platform.runLater(() -> {
+                double lineOfPlayWidth = calculateLineOfPlayWidth();
+                this.primaryStage.setMinWidth(lineOfPlayWidth);
+            });
 
             System.out.println("Current Board: " + this.lineOfPlay);
         }
@@ -458,13 +463,19 @@ public class GameplayScreen {
             Line line = new Line(100, 0, 100, 50);
             line.setStroke(Color.WHITE);
          
-            circles_hBox.getChildren().addAll(leftPane, line, rightPane);
+            Platform.runLater(() -> {
+                circles_hBox.getChildren().addAll(leftPane, line, rightPane);
+            });
         } else {
-            circles_hBox.getChildren().addAll(leftPane, rightPane);
+            Platform.runLater(() -> {
+                circles_hBox.getChildren().addAll(leftPane, rightPane);
+            });
         }
         
         StackPane stackPanePlate = new StackPane();
-        stackPanePlate.getChildren().addAll(rectangle, circles_hBox);
+        Platform.runLater(() -> {
+            stackPanePlate.getChildren().addAll(rectangle, circles_hBox);
+        });
 
         if (index != " ") stackPanePlate.setUserData(index);
 
@@ -499,8 +510,10 @@ public class GameplayScreen {
 
     private void updatePlateColors() {
         for (StackPane plate : this.player1Plates) {
-            Rectangle rectangle = (Rectangle) plate.getChildren().get(0);
-            rectangle.setFill(this.your_turn ? Color.LIGHTGREEN : Color.RED);
+            Platform.runLater(() -> {
+                Rectangle rectangle = (Rectangle) plate.getChildren().get(0);
+                rectangle.setFill(this.your_turn ? Color.LIGHTGREEN : Color.RED);
+            });
         }
     }
 }
