@@ -197,18 +197,25 @@ public class GameplayScreen {
             String serverMessage = fromServer.nextLine();
 
             if(serverMessage.contains(" ")) {
+
                 this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                 serverMessage = serverMessage.substring(0, serverMessage.indexOf(" "));
+
             }
 
-            Runnable command = gameCommands.get(serverMessage);
-            if (command != null) {
-                command.run();
-            }
+            processServerMessage(serverMessage);
 
             if (serverMessage.equals("SCORE")) {
                 break;
             }
+        }
+    }
+
+    private void processServerMessage(String serverMessage) {
+        // Look up the command in the gameCommands map
+        Runnable command = gameCommands.get(serverMessage);
+        if (command != null) {
+            command.run();
         }
     }
 
