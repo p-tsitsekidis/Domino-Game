@@ -3,10 +3,12 @@ package gr.uop;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.FillTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -56,7 +58,7 @@ public class GameplayScreen {
     
     // JavaFX items
     private Label turnMessageLabel;
-    
+
     private List<StackPane> player1Plates;
     private boolean your_turn;
     private BorderPane gameLayout;
@@ -68,6 +70,9 @@ public class GameplayScreen {
     private VBox player1Fix;
     private HBox player1Info;
 
+    private Label info_label;
+    private int sum_invalid_moves = 0;
+    private boolean stock = false;
 
     private int opp_tiles_size;
     private HBox player2Info;
@@ -75,7 +80,7 @@ public class GameplayScreen {
     private VBox player2Fix;
     private Label player2Label;
 
-    private Label VBox_stock;
+    private Label stock_label;
     
     public GameplayScreen(Stage primaryStage, Socket socket, String playerName, String opponentName, PrintWriter toServer, Scanner fromServer, Runnable onGameShutdown) {
         this.primaryStage = primaryStage;
@@ -106,7 +111,7 @@ public class GameplayScreen {
         gameCommands.put("OPP_PLAYED", () -> handleOppPlayed(data));
         gameCommands.put("PASS", this::handlePass);
         gameCommands.put("OPP_PASS", this::handleOppPass);
-        gameCommands.put("INDEX", this::handleIndex);
+        gameCommands.put("INDEX", () -> handleIndex(index));
         gameCommands.put("INVALID_MOVE", this::handleInvalidMove);
         gameCommands.put("INVALID_INPUT", this::handleInvalidInput);
         gameCommands.put("GAME_OVER", () -> handleGameOver(data));
@@ -143,6 +148,10 @@ public class GameplayScreen {
         
         // ---------------------------------------------------------------------------------
 
+        this.info_label = new Label();
+
+        // ---------------------------------------------------------------------------------
+
         this.player2Label = new Label();
         this.player2Label.setStyle("-fx-font-size: 17px;");
 
@@ -168,10 +177,10 @@ public class GameplayScreen {
         this.player1Info.getChildren().add(this.player1Fix);
         this.player2Info.getChildren().add(this.player2Fix);
         
-        this.VBox_stock = new Label();
-        this.VBox_stock.setStyle("-fx-font-size: 13px;");
+        this.stock_label = new Label();
+        this.stock_label.setStyle("-fx-font-size: 13px;");
 
-        this.player1Fix.getChildren().addAll(player1Label, VBox_stock, player1HBoxRectangles);
+        this.player1Fix.getChildren().addAll(player1Label, stock_label, player1HBoxRectangles, this.info_label);
         this.player2Fix.getChildren().addAll(player2Label, player2HBoxRectangles);
 
         this.player_tiles_size = 7;
@@ -180,7 +189,7 @@ public class GameplayScreen {
         this.player1Plates = new ArrayList<>();
 
         // this.player1Fix.getChildren()
-        // this.gameLayout.setRight(VBox_stock);
+        // this.gameLayout.setRight(stock_label);
     }
 
     private void handleGameLoop() {
@@ -188,25 +197,18 @@ public class GameplayScreen {
             String serverMessage = fromServer.nextLine();
 
             if(serverMessage.contains(" ")) {
-
                 this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                 serverMessage = serverMessage.substring(0, serverMessage.indexOf(" "));
-
             }
 
-            processServerMessage(serverMessage);
+            Runnable command = gameCommands.get(serverMessage);
+            if (command != null) {
+                command.run();
+            }
 
             if (serverMessage.equals("SCORE")) {
                 break;
             }
-        }
-    }
-
-    private void processServerMessage(String serverMessage) {
-        // Look up the command in the gameCommands map
-        Runnable command = gameCommands.get(serverMessage);
-        if (command != null) {
-            command.run();
         }
     }
 
@@ -215,7 +217,11 @@ public class GameplayScreen {
     private void handleTurn() {
         this.your_turn = true;
         // gameLayout.setStyle("-fx-background-color: lightgreen;");
-        this.turnMessageLabel.setText("It's your turn!");
+
+        Platform.runLater(() -> {
+            this.turnMessageLabel.setText("It's your turn!");
+        });
+
         System.out.println("It's your turn [" + playerName + "]!");
     }
 
@@ -223,7 +229,7 @@ public class GameplayScreen {
         stock_size = data;
         Platform.runLater(() -> {
             int size = Integer.parseInt(stock_size);
-            VBox_stock.setText("Stock: " + size);
+            stock_label.setText("Stock: " + size);
         });
     }
 
@@ -297,7 +303,7 @@ public class GameplayScreen {
 
 
         updatePlateColors();
-    }    
+    }
 
     private void handleLineOfPlay(String data) {
         lineOfPlay = data;
@@ -332,11 +338,22 @@ public class GameplayScreen {
     private void handleWaitForMove() {
         // gameLayout.setStyle("-fx-background-color: red;");
         updatePlateColors();
-        this.turnMessageLabel.setText("Waiting for [" + this.opponentName + "] to make a move.");
+        
+        Platform.runLater(() -> {
+            this.turnMessageLabel.setText("Waiting for [" + this.opponentName + "] to make a move.");
+        });
+
         System.out.println("Waiting for [" + this.opponentName + "] to make a move.");
     }
     
     private void handleNoAvailableMoves() {
+        stock = true;
+        Platform.runLater(() -> {
+            this.info_label.setText("No available moves. Drawing from stock...");
+
+            // this.playPauseTransition();
+        });
+
         System.out.println("No available moves. Drawing from stock...");
     }
     
@@ -353,8 +370,17 @@ public class GameplayScreen {
     
     private void handlePlayed(String data) {
         tile = data;
-
         this.your_turn = false;
+        this.sum_invalid_moves = 0;
+
+        if (!stock) {
+            Platform.runLater(() -> {
+                this.info_label.setText("You played: " + tile);
+                
+                // this.playPauseTransition();
+            });
+        } else stock = false;
+
         System.out.println("You played: " + tile);
     }
 
@@ -362,26 +388,48 @@ public class GameplayScreen {
         tile = data;
         this.your_turn = true;
         this.opp_tiles_size--;
+
+        if (!stock) {
+            Platform.runLater(() -> {
+                this.info_label.setText("[" + this.opponentName + "] (opponent) played: " + this.tile);
+            });
+        } else stock = false;
+            
         System.out.println(opponentName + " played: " + tile);
     }
 
     private void handlePass() {
+        Platform.runLater(() -> {
+            this.info_label.setText("No valid tiles to play and no more tiles in the stock. Passing turn.");
+
+            // this.playPauseTransition();
+        });
+
         System.out.println("No valid tiles to play and no more tiles in the stock. Passing turn.");
     }
 
     private void handleOppPass() {
+        Platform.runLater(() -> {
+            this.info_label.setText("[" + this.opponentName + "] (opponent) has no valid tiles to play and the stock is empty. Passed the turn.");
+
+            // this.playPauseTransition();
+        });
+
         System.out.println(opponentName + " has no valid tiles to play and the stock is empty.");
         System.out.println(opponentName + " passed the turn.");
     }
 
-    private void handleIndex() {
+    private void handleIndex(int index) {
         // System.out.println("Enter the index of the tile you want to play: ");
         // index = userInput.nextLine();
         // toServer.println(index);
     }
 
-
     private void handleInvalidMove() {
+        Platform.runLater(() -> {
+            this.info_label.setText("Invalid move. Choose a different tile. (" + (++sum_invalid_moves) + ")");
+        });
+
         System.out.println("Invalid move. Choose a different tile.");
     }
 
@@ -391,16 +439,38 @@ public class GameplayScreen {
 
     private void handleGameOver(String data) {
         winner = data;
+
         System.out.println("\nGame over! The winner is: " + winner + "!");
     }
 
     private void handleScore(String data) {
         score = data;
-        System.out.println("You scored: " + score + " points!");
-        onGameShutdown.run();
+        showWinnerDialog(this.winner, "Your score: " + this.score);
     }
 
     // ----------------------- JAVA FX FUNCTIONS ---------------------------------
+
+    private void playPauseTransition() {
+        PauseTransition pause = new PauseTransition(Duration.seconds(4));
+        pause.setOnFinished(event -> {
+            this.info_label.setText("");
+        });
+        
+        pause.play();
+    }
+
+    private void showWinnerDialog(String winner, String score) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText(winner.equals(this.playerName) ? "🎉 Congratulations! 🎉" : "You lost!");
+            alert.setContentText("Winner: " + winner + "\n" + score);
+            alert.showAndWait();
+
+            System.out.println("You scored: " + score + " points!");
+            onGameShutdown.run();
+        });
+    }
 
     private double calculatePlayerHeight(HBox playerHBox) {
         return playerHBox.getChildren().size() > 0 ? 200 * 2 : 0;
@@ -502,7 +572,9 @@ public class GameplayScreen {
                 pane.setSpacing(spaceBetweenCircles);
             }
 
-            pane.getChildren().add(circle);
+            // Platform.runLater(() -> {
+                pane.getChildren().add(circle);
+            // });
         }
 
         return pane;
