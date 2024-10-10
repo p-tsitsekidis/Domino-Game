@@ -189,21 +189,12 @@ public class GameplayScreen {
 
             if(serverMessage.contains(" ")) {
 
-                if (serverMessage.contains("BOARD"))
-                    this.lineOfPlay = serverMessage.substring(serverMessage.indexOf(" ") + 1);
-                else if (serverMessage.contains("TILES"))
-                    this.tiles = serverMessage.substring(serverMessage.indexOf(" ") + 1);
-                else if (serverMessage.contains("STOCK_SIZE"))
-                    this.stock_size = serverMessage.substring(serverMessage.indexOf(" ") + 1);
-                else
-                    this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
-                    
-                System.out.println("LOOP: " + this.tiles);
+                this.data = serverMessage.substring(serverMessage.indexOf(" ") + 1);
                 serverMessage = serverMessage.substring(0, serverMessage.indexOf(" "));
+
             }
 
-            final String finalServerMessage = serverMessage;
-            Platform.runLater(() -> processServerMessage(finalServerMessage));
+            processServerMessage(serverMessage);
 
             if (serverMessage.equals("SCORE")) {
                 break;
