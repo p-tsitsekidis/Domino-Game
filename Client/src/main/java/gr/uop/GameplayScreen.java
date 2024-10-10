@@ -106,7 +106,7 @@ public class GameplayScreen {
         gameCommands.put("OPP_PLAYED", () -> handleOppPlayed(data));
         gameCommands.put("PASS", this::handlePass);
         gameCommands.put("OPP_PASS", this::handleOppPass);
-        gameCommands.put("INDEX", () -> handleIndex(index));
+        gameCommands.put("INDEX", this::handleIndex);
         gameCommands.put("INVALID_MOVE", this::handleInvalidMove);
         gameCommands.put("INVALID_INPUT", this::handleInvalidInput);
         gameCommands.put("GAME_OVER", () -> handleGameOver(data));
@@ -373,7 +373,7 @@ public class GameplayScreen {
         System.out.println(opponentName + " passed the turn.");
     }
 
-    private void handleIndex(int index) {
+    private void handleIndex() {
         // System.out.println("Enter the index of the tile you want to play: ");
         // index = userInput.nextLine();
         // toServer.println(index);
