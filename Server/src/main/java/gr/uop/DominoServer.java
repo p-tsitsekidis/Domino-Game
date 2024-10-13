@@ -62,7 +62,6 @@ public class DominoServer {
             // Initialize GameEngine with player names
             gameEngine = new GameEngine(player1Name, player2Name);
             Player player1 = gameEngine.getPlayer1();
-            Player player2 = gameEngine.getPlayer2();
 
             // Send initialization completion messages to clients
             toPlayer1.println("END_INIT " + player2Name);
@@ -72,9 +71,10 @@ public class DominoServer {
             boolean gameOver = false;
             while (!gameOver) {
                 Player currentPlayer = gameEngine.getCurrentPlayer();
+                Player opponent = gameEngine.getOpponent();
                 Scanner fromCurrentPlayer = (currentPlayer == player1) ? fromPlayer1 : fromPlayer2;
                 PrintWriter toCurrentPlayer = (currentPlayer == player1) ? toPlayer1 : toPlayer2;
-                PrintWriter toOtherPlayer = (currentPlayer == player1) ? toPlayer2 : toPlayer1;
+                PrintWriter toOpponent = (currentPlayer == player1) ? toPlayer2 : toPlayer1;
 
                 // Communicate game state to the players
                 toCurrentPlayer.println("TURN");
@@ -82,15 +82,10 @@ public class DominoServer {
                 toCurrentPlayer.println("TILES " + currentPlayer.getTiles());
                 toCurrentPlayer.println("BOARD " + gameEngine.getLineOfPlay());
 
-                toOtherPlayer.println("STOCK_SIZE " + gameEngine.getStockSize());
-                if (currentPlayer.equals(player1)) {
-                    toOtherPlayer.println("TILES " + player2.getTiles());
-                } else {
-                    toOtherPlayer.println("TILES " + player1.getTiles());
-                }
-                
-                toOtherPlayer.println("BOARD " + gameEngine.getLineOfPlay());
-                toOtherPlayer.println("WAIT_OPPONENT_MOVE");
+                toOpponent.println("STOCK_SIZE " + gameEngine.getStockSize());
+                toOpponent.println("TILES " + opponent.getTiles());
+                toOpponent.println("BOARD " + gameEngine.getLineOfPlay());
+                toOpponent.println("WAIT_OPPONENT_MOVE");
 
                 boolean validMove = false;
 
@@ -102,18 +97,18 @@ public class DominoServer {
                         while (!validMove && gameEngine.drawTile()) {
                             Tile drawnTile = currentPlayer.getTiles().get(currentPlayer.getTiles().size() - 1);
                             toCurrentPlayer.println("DRAW " + drawnTile);
-                            toOtherPlayer.println("OPPONENT_DRAW");
+                            toOpponent.println("OPPONENT_DRAW");
 
                             validMove = gameEngine.playTile(drawnTile);
                             if (validMove) {
                                 toCurrentPlayer.println("PLAYED " + drawnTile);
-                                toOtherPlayer.println("OPP_PLAYED " + drawnTile);
+                                toOpponent.println("OPP_PLAYED " + drawnTile);
                             }
                         }
 
                         if (!validMove) { // No valid moves and no tiles to draw from stock
                             toCurrentPlayer.println("PASS");
-                            toOtherPlayer.println("OPP_PASS");
+                            toOpponent.println("OPP_PASS");
                             break;
                         }
                     } else {
@@ -128,7 +123,7 @@ public class DominoServer {
                             validMove = gameEngine.playTile(chosenTile);
                             if (validMove) {
                                 toCurrentPlayer.println("PLAYED " + chosenTile);
-                                toOtherPlayer.println("OPP_PLAYED " + chosenTile);
+                                toOpponent.println("OPP_PLAYED " + chosenTile);
                             } else {
                                 toCurrentPlayer.println("INVALID_MOVE");
                             }
@@ -142,11 +137,13 @@ public class DominoServer {
                 if (gameEngine.isGameOver()) {
                     gameOver = true;
                     Player winner = gameEngine.getWinner();
-                    Player opponent = (player1Name.equals(winner.getName()) ? player2 : player1);
+                    Player notWinner = gameEngine.getOpponent(winner);
+
                     toCurrentPlayer.println("GAME_OVER " + winner.getName());
                     toCurrentPlayer.println("SCORE " + currentPlayer.getScore());
-                    toOtherPlayer.println("GAME_OVER " + winner.getName());
-                    toOtherPlayer.println("SCORE " + opponent.getScore());
+
+                    toOpponent.println("GAME_OVER " + winner.getName());
+                    toOpponent.println("SCORE " + notWinner.getScore());
                 }
             }
 
