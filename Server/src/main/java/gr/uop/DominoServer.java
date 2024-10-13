@@ -109,6 +109,7 @@ public class DominoServer {
                         if (!validMove) { // No valid moves and no tiles to draw from stock
                             toCurrentPlayer.println("PASS");
                             toOpponent.println("OPP_PASS");
+                            gameEngine.passTurn();
                             break;
                         }
                     } else {
