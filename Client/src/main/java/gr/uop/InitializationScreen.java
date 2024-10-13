@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 public class InitializationScreen {
 
     private static final int PORT = 7777;
+
     private Socket socket;
     private PrintWriter toServer;
     private Scanner fromServer;
@@ -29,11 +30,11 @@ public class InitializationScreen {
 
     private String playerName;
     private String opponentName;
-    private Label statusLabel;
     private String data;
 
     private Stage primaryStage;
     private Button startButton;
+    private Label statusLabel;
 
     private Map<String, Runnable> initCommands = new HashMap<>();
 
@@ -177,7 +178,7 @@ public class InitializationScreen {
         nameDialog.setContentText("Name:");
 
         Optional<String> nameResult = nameDialog.showAndWait();
-        nameResult.ifPresent(name -> playerName = name);
+        nameResult.ifPresent(name -> this.playerName = name);
 
         if (playerName == null || playerName.isEmpty()) {
             showErrorMessage("Invalid name. Please try again.");
@@ -187,8 +188,8 @@ public class InitializationScreen {
     }
 
     private void handleEndInit(String data) {
-        opponentName = data;
-        updateStatus("Hello " + playerName + "! Your opponent is: " + opponentName + "!\nThe game is starting...");
+        this.opponentName = data;
+        updateStatus("Hello " + this.playerName + "! Your opponent is: " + this.opponentName + "!\nThe game is starting...");
 
         // Notify JavaFXClient that the initialization is complete and pass necessary data
         if (onInitializationComplete != null) {
