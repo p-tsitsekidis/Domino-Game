@@ -138,12 +138,13 @@ public class GameEngine {
 
     /**
      * Checks if the game is over. The game ends when a player has no tiles or 
-     * when no valid moves can be made and the stock is empty.
+     * when both players have no valid moves and the stock is empty.
      * 
      * @return true if the game is over, false otherwise.
      */
     public boolean isGameOver() {
-        return player1.getTiles().isEmpty() || player2.getTiles().isEmpty() || (!canPlay() && stock.isEmpty());
+        return player1.getTiles().isEmpty() || player2.getTiles().isEmpty() || 
+            (stock.isEmpty() && !playerCanPlay(player1) && !playerCanPlay(player2));
     }
 
     /**
