@@ -42,7 +42,7 @@ public class GameEngine {
 
         player1 = new Player(player1Name, player1Tiles);
         player2 = new Player(player2Name, player2Tiles);
-        stock.clear();
+
         Random random = new Random();
         currentPlayer = random.nextBoolean() ? player1 : player2;
 
