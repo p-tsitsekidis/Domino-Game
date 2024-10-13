@@ -167,7 +167,7 @@ public class Client {
     }
 
     private void handleEndInit(String data) {
-        opponentName = data;
+        this.opponentName = data;
         System.out.println("Hello " + playerName + "!");
         System.out.println("Your opponent is: " + opponentName + "!");
         System.out.println("The game is starting...");
@@ -179,17 +179,17 @@ public class Client {
     }
 
     private void handleTiles(String data) {
-        tiles = data;
-        System.out.println("Your tiles: " + tiles);
+        this.tiles = data;
+        System.out.println("Your tiles: " + this.tiles);
     }
 
     private void handleLineOfPlay(String data) {
-        lineOfPlay = data;
-        System.out.println("Current Board: " + lineOfPlay);
+        this.lineOfPlay = data;
+        System.out.println("Current Board: " + this.lineOfPlay);
     }
 
     private void handleWaitForMove() {
-        System.out.println("Waiting for " + opponentName + " to make a move.");
+        System.out.println("Waiting for " + this.opponentName + " to make a move.");
     }
 
     private void handleNoAvailableMoves() {
@@ -197,22 +197,22 @@ public class Client {
     }
 
     private void handleDraw(String data) {
-        tile = data;
-        System.out.println("You drew: " + tile);
+        this.tile = data;
+        System.out.println("You drew: " + this.tile);
     }
 
     private void handleOppDraw() {
-        System.out.println(opponentName + " drew a tile.");
+        System.out.println(this.opponentName + " drew a tile.");
     }
 
     private void handlePlayed(String data) {
-        tile = data;
-        System.out.println("You played: " + tile);
+        this.tile = data;
+        System.out.println("You played: " + this.tile);
     }
 
     private void handleOppPlayed(String data) {
-        tile = data;
-        System.out.println(opponentName + " played: " + tile);
+        this.tile = data;
+        System.out.println(opponentName + " played: " + this.tile);
     }
 
     private void handlePass() {
@@ -220,14 +220,14 @@ public class Client {
     }
 
     private void handleOppPass() {
-        System.out.println(opponentName + " has no valid tiles to play and the stock is empty.");
-        System.out.println(opponentName + " passed the turn.");
+        System.out.println(this.opponentName + " has no valid tiles to play and the stock is empty.");
+        System.out.println(this.opponentName + " passed the turn.");
     }
 
     private void handleIndex() {
         System.out.println("Enter the index of the tile you want to play: ");
-        index = userInput.nextLine();
-        toServer.println(index);
+        this.index = userInput.nextLine();
+        toServer.println(this.index);
     }
 
     private void handleInvalidMove() {
@@ -239,12 +239,12 @@ public class Client {
     }
 
     private void handleGameOver(String data) {
-        winner = data;
-        System.out.println("\nGame over! The winner is: " + winner + "!");
+        this.winner = data;
+        System.out.println("\nGame over! The winner is: " + this.winner + "!");
     }
 
     private void handleScore(String data) {
-        score = data;
-        System.out.println("You scored: " + score + " points!");
+        this.score = data;
+        System.out.println("You scored: " + this.score + " points!");
     }
 }
