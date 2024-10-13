@@ -16,20 +16,23 @@ public class Server {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+        // Display game version options
         System.out.println("Choose the game version:");
         System.out.println("1. Command Line (Local)");
         System.out.println("2. Networked Server");
         System.out.print("Enter your choice: ");
 
+        // Get user choice
         int choice = scanner.nextInt();
-        scanner.nextLine(); //Consume newline
+        scanner.nextLine(); // Consume newline left by nextInt()
 
+        // Execute corresponding game mode based on user input
         switch (choice) {
             case 1:
-                runCommandLineGame();  //Run command line game locally
+                runCommandLineGame();  // Run the command line game locally
                 break;
             case 2:
-                runNetworkedServer();  //Run command line game on the networked server
+                runNetworkedServer();  // Run the networked server game
                 break;
             default:
                 System.out.println("Invalid choice. Exiting...");

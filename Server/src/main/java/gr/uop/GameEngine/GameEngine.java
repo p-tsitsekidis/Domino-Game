@@ -14,10 +14,11 @@ import java.util.Random;
  */
 public class GameEngine {
 
-    private Queue<Tile> stock;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
+    
+    private Queue<Tile> stock;
     private Deque<Tile> lineOfPlay; // The sequence of tiles currently played in the game
     
     /**
