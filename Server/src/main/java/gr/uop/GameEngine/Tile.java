@@ -49,9 +49,7 @@ public class Tile {
 
         if (this.upperValue == otherTile.upperValue || this.upperValue == otherTile.bottomValue ||
         this.bottomValue == otherTile.upperValue || this.bottomValue == otherTile.bottomValue) {
-
             return true;
-
         }
         return false;
     }
