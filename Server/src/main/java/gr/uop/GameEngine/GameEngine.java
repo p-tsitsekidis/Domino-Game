@@ -164,6 +164,9 @@ public class GameEngine {
             int player1Sum = calculateHandSum(player1);
             int player2Sum = calculateHandSum(player2);
 
+            player1.updateScore(player2Sum);
+            player2.updateScore(player1Sum);
+
             if (player1Sum < player2Sum) {
                 player1.updateScore(player2Sum - player1Sum);
                 return player1;
