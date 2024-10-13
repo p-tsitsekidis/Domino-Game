@@ -42,7 +42,7 @@ public class GameEngine {
 
         player1 = new Player(player1Name, player1Tiles);
         player2 = new Player(player2Name, player2Tiles);
-        
+        stock.clear();
         Random random = new Random();
         currentPlayer = random.nextBoolean() ? player1 : player2;
 
@@ -187,10 +187,8 @@ public class GameEngine {
             player2.updateScore(player1Sum);
 
             if (player1Sum < player2Sum) {
-                player1.updateScore(player2Sum - player1Sum);
                 return player1;
             } else {
-                player2.updateScore(player1Sum - player2Sum);
                 return player2;
             }
         }
@@ -223,6 +221,13 @@ public class GameEngine {
      */
     private void switchPlayer() {
         currentPlayer = (currentPlayer == player1) ? player2 : player1;
+    }
+
+    /**
+     * Handles the pass action when the current player cannot make a move.
+     */
+    public void passTurn() {
+        switchPlayer(); // switchPlayer() remains private
     }
 
     // Getter Methods
