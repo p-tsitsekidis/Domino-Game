@@ -53,7 +53,7 @@ public class InitializationScreen {
         initCommands.put("WAIT_PLAYER1_NAME", this::handlePlayer1Name);
         initCommands.put("WAIT_PLAYER2_NAME", this::handlePlayer2Name);
         initCommands.put("NAME_REQUEST", this::handleNameRequest);
-        initCommands.put("END_INIT", () -> handleEndInit(playerName, data));
+        initCommands.put("END_INIT", () -> handleEndInit(data));
     }
 
     private void setupUI() {
@@ -155,7 +155,7 @@ public class InitializationScreen {
     // ------------------------------------------- HANDLES -------------------------------------------
 
     private void handleWaitConnect() {
-       updateStatus("Waiting for Player 2 to connect...");
+        updateStatus("Waiting for Player 2 to connect...");
     }
 
     private void handlePlayerConnected() {
@@ -186,7 +186,7 @@ public class InitializationScreen {
         toServer.println(playerName);
     }
 
-    private void handleEndInit(String playerName, String data) {
+    private void handleEndInit(String data) {
         opponentName = data;
         updateStatus("Hello " + playerName + "! Your opponent is: " + opponentName + "!\nThe game is starting...");
 
