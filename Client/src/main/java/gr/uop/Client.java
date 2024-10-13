@@ -68,10 +68,10 @@ public class Client {
         initCommands.put("WAIT_PLAYER1_NAME", this::handlePlayer1Name);
         initCommands.put("WAIT_PLAYER2_NAME", this::handlePlayer2Name);
         initCommands.put("NAME_REQUEST", this::handleNameRequest);
-        initCommands.put("END_INIT", () -> handleEndInit(playerName, data));
+        initCommands.put("END_INIT", () -> handleEndInit(data));
 
         // Gameplay phase
-        gameCommands.put("TURN", () -> handleTurn(playerName));
+        gameCommands.put("TURN", this::handleTurn);
         gameCommands.put("TILES", () -> handleTiles(data));
         gameCommands.put("BOARD", () -> handleLineOfPlay(data));
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
@@ -166,7 +166,7 @@ public class Client {
         toServer.println(playerName);
     }
 
-    private void handleEndInit(String playerName, String data) {
+    private void handleEndInit(String data) {
         opponentName = data;
         System.out.println("Hello " + playerName + "!");
         System.out.println("Your opponent is: " + opponentName + "!");
@@ -174,7 +174,7 @@ public class Client {
     }
 
     // ------------------------------------ GAMEPLAY HANDLES -------------------------------------------
-    private void handleTurn(String playerName) {
+    private void handleTurn() {
         System.out.println("It's your turn " + playerName + "!");
     }
 
