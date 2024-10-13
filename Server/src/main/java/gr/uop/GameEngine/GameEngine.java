@@ -8,14 +8,25 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
+/**
+ * GameEngine class is responsible for managing the game state, 
+ * including players, tiles, and the logic of gameplay.
+ */
 public class GameEngine {
-    
+
     private Queue<Tile> stock;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
-    private Deque<Tile> lineOfPlay;
-
+    private Deque<Tile> lineOfPlay; // The sequence of tiles currently played in the game
+    
+    /**
+     * Constructor to initialize the GameEngine with two players.
+     * It creates the stock, shuffles the tiles, and assigns 7 tiles to each player.
+     * 
+     * @param player1Name Name of the first player
+     * @param player2Name Name of the second player
+     */
     public GameEngine(String player1Name, String player2Name) {
         stock = createDominoStock();
         Collections.shuffle((List<?>) stock);
@@ -37,6 +48,11 @@ public class GameEngine {
         lineOfPlay = new LinkedList<>();
     }
 
+    /**
+     * Creates the initial domino stock (all tile combinations) and returns it.
+     * 
+     * @return A queue of all the domino tiles.
+     */
     private Queue<Tile> createDominoStock() {
         Queue<Tile> tiles = new LinkedList<>();
         for (int i = 0; i <= 6; i++) {
@@ -47,6 +63,14 @@ public class GameEngine {
         return tiles;
     }
 
+    /**
+     * Allows the current player to play a tile.
+     * It checks whether the tile can be placed on either side of the line of play.
+     * If the tile is valid, it is placed and the player removes it from their hand.
+     * 
+     * @param tile The tile to be played.
+     * @return true if the tile was successfully played, false otherwise.
+     */
     public boolean playTile(Tile tile) {
         if (lineOfPlay.isEmpty()) { //Empty line of play
             lineOfPlay.add(tile);
@@ -58,7 +82,7 @@ public class GameEngine {
         Tile firstTile = lineOfPlay.getFirst();
         Tile lastTile = lineOfPlay.getLast();
 
-        if (tile.fits(firstTile.getUpperValue())) { //Check if matches the first tile
+        if (tile.fits(firstTile.getUpperValue())) { // Check if the tile matches the first tile
             if (tile.getBottomValue() != firstTile.getUpperValue()) {
                 tile.invert();
             }
@@ -66,7 +90,7 @@ public class GameEngine {
             currentPlayer.removeTile(tile);
             switchPlayer();
             return true;
-        } else if (tile.fits(lastTile.getBottomValue())) { //Check if matched the last tile
+        } else if (tile.fits(lastTile.getBottomValue())) { // Check if the tile matches the last tile
             if (tile.getUpperValue() != lastTile.getBottomValue()) {
                 tile.invert();
             }
@@ -79,7 +103,12 @@ public class GameEngine {
         return false; //Doesn't fit
     }
 
-    public boolean drawTile() { //If a player cannot play
+    /**
+     * Allows the current player to draw a tile from the stock when they have no valid moves.
+     * 
+     * @return true if a tile was drawn, false if the stock is empty.
+     */
+    public boolean drawTile() {
         if (stock.isEmpty()) {
             return false;
         }
@@ -89,6 +118,11 @@ public class GameEngine {
         return true;
     }
 
+    /**
+     * Checks whether the current player has a valid move to play on the board.
+     * 
+     * @return true if the player has a valid move, false otherwise.
+     */
     public boolean canPlay() {
         if (lineOfPlay.isEmpty()) {
             return true;
@@ -101,10 +135,23 @@ public class GameEngine {
         return false;
     }
 
+    /**
+     * Checks if the game is over. The game ends when a player has no tiles or 
+     * when no valid moves can be made and the stock is empty.
+     * 
+     * @return true if the game is over, false otherwise.
+     */
     public boolean isGameOver() {
         return player1.getTiles().isEmpty() || player2.getTiles().isEmpty() || (!canPlay() && stock.isEmpty());
     }
 
+    /**
+     * Determines the winner of the game.
+     * The winner is the player who empties their hand first or has the fewest points 
+     * when no valid moves can be made.
+     * 
+     * @return The winning player.
+     */
     public Player getWinner() { //Returns the winning player
         if (player1.getTiles().isEmpty()) {
             calculateFinalScore(player1, player2);
@@ -126,28 +173,61 @@ public class GameEngine {
         }
     }
 
+    /**
+     * Calculates and updates the final score of the winner.
+     * The score is based on the remaining tiles in the opponent's hand.
+     * 
+     * @param winner The player who won the game.
+     * @param opponent The opponent of the winning player.
+     */
     private void calculateFinalScore(Player winner, Player opponent) {
         int opponentHandSum = calculateHandSum(opponent);
         winner.updateScore(opponentHandSum);
     }
 
+    /**
+     * Calculates the sum of all tile values in a player's hand.
+     * 
+     * @param player The player whose hand is being calculated.
+     * @return The total sum of the tile values.
+     */
     private int calculateHandSum(Player player) {
         return player.getTiles().stream().mapToInt(tile -> tile.getUpperValue() + tile.getBottomValue()).sum();
     }
-    
+
+    /**
+     * Switches the current player, alternating between player1 and player2.
+     */
     private void switchPlayer() {
         currentPlayer = (currentPlayer == player1) ? player2 : player1;
     }
 
+    // Getter Methods
+
+    /**
+     * Returns the current player who is about to make a move.
+     * 
+     * @return The current player.
+     */
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
 
+    /**
+     * Returns the current line of play, i.e., the tiles played on the board.
+     * 
+     * @return A deque containing the tiles in the line of play.
+     */
     public Deque<Tile> getLineOfPlay() {
         return lineOfPlay;
     }
 
-    public int[] getOpenEnds() { //Array is extremely efficient since we only have 2 open ends (No spinners)
+    /**
+     * Returns the two open ends of the current line of play, which are used to validate tile placements.
+     * 
+     * @return An array containing the two open ends of the line of play.
+     */
+    public int[] getOpenEnds() { // Array is extremely efficient since we only have 2 open ends (No spinners)
         int[] openEnds = new int[2];
         if (!lineOfPlay.isEmpty()) {
             openEnds[0] = lineOfPlay.getFirst().getUpperValue();
@@ -156,18 +236,41 @@ public class GameEngine {
         return openEnds;
     }
 
+    /**
+     * Returns Player 1 in the game.
+     * 
+     * @return Player 1 object.
+     */
     public Player getPlayer1() {
         return player1;
     }
-    
+
+    /**
+     * Returns Player 2 in the game.
+     * 
+     * @return Player 2 object.
+     */
     public Player getPlayer2() {
         return player2;
     }
 
+    /**
+     * Returns the number of tiles remaining in the stock.
+     * 
+     * @return The size of the stock.
+     */
     public int getStockSize() {
         return stock.size();
     }
 
+    // toString Method
+
+    /**
+     * Returns a string representation of the current state of the game engine,
+     * including the stock, line of play, players, and current player.
+     * 
+     * @return A string representing the game engine state.
+     */
     @Override
     public String toString() {
         return "GameEngine{" +
