@@ -149,7 +149,7 @@ public class GameEngine {
     /**
      * Determines the winner of the game.
      * The winner is the player who empties their hand first or has the fewest points 
-     * when no valid moves can be made.
+     * when no valid moves can be made. Draws are handed as wins to player 2.
      * 
      * @return The winning player.
      */
