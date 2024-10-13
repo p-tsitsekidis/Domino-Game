@@ -17,7 +17,7 @@ public class GameEngine {
     private Player player1;
     private Player player2;
     private Player currentPlayer;
-    
+
     private Queue<Tile> stock;
     private Deque<Tile> lineOfPlay; // The sequence of tiles currently played in the game
     
@@ -212,6 +212,23 @@ public class GameEngine {
      */
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    /**
+     * Returns the opponent of the current player.
+     * @return the opponent of the current player.
+     */
+    public Player getOpponent() {
+        return (currentPlayer == player1) ? player2 : player1;
+    }
+
+    /**
+     * Returns the opponent of the given player (used, for example, to determine the player who did not win).
+     * @param player Any Player object.
+     * @return The opponent of the given player.
+     */
+    public Player getOpponent(Player player) {
+        return (player == player1) ? player2 : player1;
     }
 
     /**
