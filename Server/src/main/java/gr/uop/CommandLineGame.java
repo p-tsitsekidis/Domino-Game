@@ -5,7 +5,17 @@ import gr.uop.GameEngine.GameEngine;
 import gr.uop.GameEngine.Player;
 import gr.uop.GameEngine.Tile;
 
+/**
+ * CommandLineGame is the entry point for the local, non-networked version of the Domino game.
+ * It allows two players to play a game of Domino using the command line interface.
+ */
 public class CommandLineGame {
+
+    /**
+     * Main method that starts the command-line game.
+     * 
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 

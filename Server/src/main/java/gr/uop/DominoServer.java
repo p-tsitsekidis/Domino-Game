@@ -10,14 +10,26 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * The DominoServer class manages a networked domino game between two players.
+ * It waits for player connections, handles the game flow, and communicates game state and moves to the clients.
+ */
 public class DominoServer {
     private static final int PORT = 7777;
     private GameEngine gameEngine;
 
+    /**
+     * The main method to start the server.
+     * 
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         new DominoServer().startServer();
     }
 
+    /**
+     * Starts the Domino game server, waits for player connections, and handles the game logic and communication.
+     */
     public void startServer() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Domino Server is running on port " + PORT);
