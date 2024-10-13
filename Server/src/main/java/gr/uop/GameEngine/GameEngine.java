@@ -147,6 +147,24 @@ public class GameEngine {
     }
 
     /**
+     * Checks whether the specified player has a valid move to play on the board.
+     * 
+     * @param player The player to check.
+     * @return true if the player has a valid move, false otherwise.
+     */
+    public boolean playerCanPlay(Player player) {
+        if (lineOfPlay.isEmpty()) {
+            return true;
+        }
+        for (Tile tile : player.getTiles()) {
+            if (tile.fits(lineOfPlay.getFirst().getUpperValue()) || tile.fits(lineOfPlay.getLast().getBottomValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Determines the winner of the game.
      * The winner is the player who empties their hand first or has the fewest points 
      * when no valid moves can be made. Draws are handed as wins to player 2.
