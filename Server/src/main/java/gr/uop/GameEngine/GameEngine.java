@@ -166,35 +166,6 @@ public class GameEngine {
     }
 
     /**
-     * Determines the winner of the game.
-     * The winner is the player who empties their hand first or has the fewest points 
-     * when no valid moves can be made. Draws are handed as wins to player 2.
-     * 
-     * @return The winning player.
-     */
-    public Player getWinner() { //Returns the winning player
-        if (player1.getTiles().isEmpty()) {
-            calculateFinalScore(player1, player2);
-            return player1;
-        } else if (player2.getTiles().isEmpty()) {
-            calculateFinalScore(player2, player1);
-            return player2;
-        } else {
-            int player1Sum = calculateHandSum(player1);
-            int player2Sum = calculateHandSum(player2);
-
-            player1.updateScore(player2Sum);
-            player2.updateScore(player1Sum);
-
-            if (player1Sum < player2Sum) {
-                return player1;
-            } else {
-                return player2;
-            }
-        }
-    }
-
-    /**
      * Calculates and updates the final score of the winner.
      * The score is based on the remaining tiles in the opponent's hand.
      * 
@@ -231,6 +202,35 @@ public class GameEngine {
     }
 
     // Getter Methods
+
+    /**
+     * Determines the winner of the game.
+     * The winner is the player who empties their hand first or has the fewest points 
+     * when no valid moves can be made. Draws are handed as wins to player 2.
+     * 
+     * @return The winning player.
+     */
+    public Player getWinner() { //Returns the winning player
+        if (player1.getTiles().isEmpty()) {
+            calculateFinalScore(player1, player2);
+            return player1;
+        } else if (player2.getTiles().isEmpty()) {
+            calculateFinalScore(player2, player1);
+            return player2;
+        } else {
+            int player1Sum = calculateHandSum(player1);
+            int player2Sum = calculateHandSum(player2);
+
+            player1.updateScore(player2Sum);
+            player2.updateScore(player1Sum);
+
+            if (player1Sum < player2Sum) {
+                return player1;
+            } else {
+                return player2;
+            }
+        }
+    }
 
     /**
      * Returns the current player who is about to make a move.
