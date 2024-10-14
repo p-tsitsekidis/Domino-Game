@@ -77,11 +77,13 @@ public class DominoServer {
                 PrintWriter toOpponent = (currentPlayer == player1) ? toPlayer2 : toPlayer1;
 
                 // Communicate game state to the players
+                toCurrentPlayer.println("OPPONENT_TILE_SIZE " + gameEngine.getPlayerTileCount(opponent));
                 toCurrentPlayer.println("TURN");
                 toCurrentPlayer.println("STOCK_SIZE " + gameEngine.getStockSize());
                 toCurrentPlayer.println("TILES " + currentPlayer.getTiles());
                 toCurrentPlayer.println("BOARD " + gameEngine.getLineOfPlay());
 
+                toOpponent.println("OPPONENT_TILE_SIZE " + gameEngine.getPlayerTileCount(currentPlayer));
                 toOpponent.println("STOCK_SIZE " + gameEngine.getStockSize());
                 toOpponent.println("TILES " + opponent.getTiles());
                 toOpponent.println("BOARD " + gameEngine.getLineOfPlay());
