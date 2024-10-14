@@ -105,6 +105,7 @@ public class GameplayScreen {
         gameCommands.put("TILES", () -> handleTiles(data));
         gameCommands.put("BOARD", () -> handleLineOfPlay(data));
         gameCommands.put("STOCK_SIZE", () -> handleStock(data));
+        gameCommands.put("OPPONENT_TILE_SIZE", () -> handleTileSize(data));
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
         gameCommands.put("NO_AVAILABLE_MOVES", this::handleNoAvailableMoves);
         gameCommands.put("DRAW", () -> handleDraw(data));
@@ -185,8 +186,6 @@ public class GameplayScreen {
         this.player1Fix.getChildren().addAll(player1Label, stockLabel, player1HBoxRectangles, this.infoLabel);
         this.player2Fix.getChildren().addAll(player2Label, player2HBoxRectangles);
 
-        this.currentPlayerTiles = 7;
-        this.opponentTiles = 7;
         this.yourTurn = false;
         this.player1Plates = new ArrayList<>();
 
@@ -240,6 +239,10 @@ public class GameplayScreen {
             int size = Integer.parseInt(stockSize);
             stockLabel.setText("Stock: " + size);
         });
+    }
+
+    private void handleTileSize(String data) {
+        this.opponentTiles = Integer.parseInt(data);
     }
 
     private void handleTiles(String data) {
@@ -372,8 +375,7 @@ public class GameplayScreen {
         System.out.println("You drew a tile!");
     }
 
-    private void handleOppDraw() {
-        this.opponentTiles++;    
+    private void handleOppDraw() {  
         System.out.println(opponentName + " drew a tile.");
     }
     
@@ -396,7 +398,6 @@ public class GameplayScreen {
     private void handleOppPlayed(String data) {
         tile = data;
         this.yourTurn = true;
-        this.opponentTiles--;
 
         if (!stock) {
             Platform.runLater(() -> {
