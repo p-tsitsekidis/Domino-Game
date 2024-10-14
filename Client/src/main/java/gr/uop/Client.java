@@ -24,6 +24,8 @@ public class Client {
     private String tile;
     private String score;
     private String index;
+    private String stockSize;
+    private String opponentTiles;
 
     private String data; // Any data received from the server
 
@@ -74,6 +76,8 @@ public class Client {
         gameCommands.put("TURN", this::handleTurn);
         gameCommands.put("TILES", () -> handleTiles(data));
         gameCommands.put("BOARD", () -> handleLineOfPlay(data));
+        gameCommands.put("STOCK_SIZE", () -> handleStock(data));
+        gameCommands.put("OPPONENT_TILE_SIZE", () -> handleTileSize(data));
         gameCommands.put("WAIT_OPPONENT_MOVE", this::handleWaitForMove);
         gameCommands.put("NO_AVAILABLE_MOVES", this::handleNoAvailableMoves);
         gameCommands.put("DRAW", () -> handleDraw(data));
@@ -176,6 +180,16 @@ public class Client {
     // ------------------------------------ GAMEPLAY HANDLES -------------------------------------------
     private void handleTurn() {
         System.out.println("It's your turn " + playerName + "!");
+    }
+
+    private void handleStock(String data) {
+        this.stockSize = data;
+        System.out.println("The stock has " + this.stockSize + " tiles.");
+    }
+
+    private void handleTileSize(String data) {
+        this.opponentTiles = data;
+        System.out.println("Your opponent has " + this.opponentTiles + " tiles.");
     }
 
     private void handleTiles(String data) {
