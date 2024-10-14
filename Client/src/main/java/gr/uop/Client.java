@@ -166,7 +166,7 @@ public class Client {
 
     private void handleNameRequest() {
         System.out.println("Please enter your name: ");
-        playerName = userInput.nextLine();
+        this.playerName = userInput.nextLine();
         toServer.println(playerName);
     }
 
