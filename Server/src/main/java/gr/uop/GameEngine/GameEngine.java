@@ -308,6 +308,15 @@ public class GameEngine {
         return stock.size();
     }
 
+    /**
+     * Returns the tile count of a given player.
+     * @param player Any player object.
+     * @return The tile count.
+     */
+    public int getPlayerTileCount(Player player) {
+        return player.getTiles().size();
+    }
+
     // toString Method
 
     /**
