@@ -234,7 +234,7 @@ public class GameplayScreen {
     }
 
     private void handleStock(String data) {
-        stockSize = data;
+        this.stockSize = data;
         Platform.runLater(() -> {
             int size = Integer.parseInt(stockSize);
             stockLabel.setText("Stock: " + size);
@@ -246,7 +246,7 @@ public class GameplayScreen {
     }
 
     private void handleTiles(String data) {
-        tiles = data;
+        this.tiles = data;
         Platform.runLater(() -> {
             this.player1HBoxRectangles.getChildren().clear();
             this.player2HBoxRectangles.getChildren().clear();
@@ -318,7 +318,7 @@ public class GameplayScreen {
     }
 
     private void handleLineOfPlay(String data) {
-        lineOfPlay = data;
+        this.lineOfPlay = data;
         if (!this.lineOfPlay.equals("[]")) {
             Platform.runLater(() -> {
                 this.JavaFXlineOfPlay.getChildren().clear();
@@ -380,7 +380,7 @@ public class GameplayScreen {
     }
     
     private void handlePlayed(String data) {
-        tile = data;
+        this.tile = data;
         this.yourTurn = false;
         this.invalidMoveSum = 0;
 
@@ -396,7 +396,7 @@ public class GameplayScreen {
     }
 
     private void handleOppPlayed(String data) {
-        tile = data;
+        this.tile = data;
         this.yourTurn = true;
 
         if (!stock) {
@@ -448,13 +448,13 @@ public class GameplayScreen {
     }
 
     private void handleGameOver(String data) {
-        winner = data;
+        this.winner = data;
 
         System.out.println("\nGame over! The winner is: " + winner + "!");
     }
 
     private void handleScore(String data) {
-        score = data;
+        this.score = data;
         showWinnerDialog(this.winner, "Your score: " + this.score);
     }
 
