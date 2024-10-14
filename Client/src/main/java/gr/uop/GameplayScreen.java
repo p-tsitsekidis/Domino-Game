@@ -32,12 +32,12 @@ import java.util.Scanner;
 
 public class GameplayScreen {
 
-    // Network communication
+    // 1. Network communication
     private Socket socket;
     private PrintWriter toServer;
     private Scanner fromServer;
 
-    // Information from the server
+    // 2. Game state information from the server
     private String playerName;
     private String opponentName;
     private String winner;
@@ -45,43 +45,45 @@ public class GameplayScreen {
     private String lineOfPlay;
     private String tile;
     private String score;
-    private String stock_size;
+    private String stockSize;
     private int index;
+    private int currentPlayerTiles;
+    private int opponentTiles;
     
     private String data; // Any data received from the server
-    
+
+    // 3. Game logic-related fields
+    private boolean yourTurn;
+    private boolean stock = false;
+    private int invalidMoveSum = 0;
+
     // HashMaps for command handling
     private Map<String, Runnable> gameCommands = new HashMap<>();
-    
-    private Stage primaryStage; // Primary stage
-    private Runnable onGameShutdown; // Signals the end of the game
-    
-    // JavaFX items
-    private Label turnMessageLabel;
 
-    private List<StackPane> player1Plates;
-    private boolean your_turn;
+    // 4. JavaFX layout and UI elements
+    private Stage primaryStage; // Primary stage for the game
+    private Runnable onGameShutdown; // Callback for game shutdown event
     private BorderPane gameLayout;
     private HBox JavaFXlineOfPlay;
 
-    private int player_tiles_size;
+    // General Labels
+    private Label turnMessageLabel;
+    private Label infoLabel;
+    private Label stockLabel;
+
+    // Player 1 (Current player) UI elements
     private Label player1Label;
+    private HBox player1Info;
     private HBox player1HBoxRectangles;
     private VBox player1Fix;
-    private HBox player1Info;
+    private List<StackPane> player1Plates; // Player 1's tiles on UI
 
-    private Label info_label;
-    private int sum_invalid_moves = 0;
-    private boolean stock = false;
-
-    private int opp_tiles_size;
+    // Player 2 (Opponent) UI elements
     private HBox player2Info;
     private HBox player2HBoxRectangles;
     private VBox player2Fix;
     private Label player2Label;
 
-    private Label stock_label;
-    
     public GameplayScreen(Stage primaryStage, Socket socket, String playerName, String opponentName, PrintWriter toServer, Scanner fromServer, Runnable onGameShutdown) {
         this.primaryStage = primaryStage;
         this.socket = socket;
@@ -148,7 +150,7 @@ public class GameplayScreen {
         
         // ---------------------------------------------------------------------------------
 
-        this.info_label = new Label();
+        this.infoLabel = new Label();
 
         // ---------------------------------------------------------------------------------
 
@@ -177,19 +179,19 @@ public class GameplayScreen {
         this.player1Info.getChildren().add(this.player1Fix);
         this.player2Info.getChildren().add(this.player2Fix);
         
-        this.stock_label = new Label();
-        this.stock_label.setStyle("-fx-font-size: 13px;");
+        this.stockLabel = new Label();
+        this.stockLabel.setStyle("-fx-font-size: 13px;");
 
-        this.player1Fix.getChildren().addAll(player1Label, stock_label, player1HBoxRectangles, this.info_label);
+        this.player1Fix.getChildren().addAll(player1Label, stockLabel, player1HBoxRectangles, this.infoLabel);
         this.player2Fix.getChildren().addAll(player2Label, player2HBoxRectangles);
 
-        this.player_tiles_size = 7;
-        this.opp_tiles_size = 7;
-        this.your_turn = false;
+        this.currentPlayerTiles = 7;
+        this.opponentTiles = 7;
+        this.yourTurn = false;
         this.player1Plates = new ArrayList<>();
 
         // this.player1Fix.getChildren()
-        // this.gameLayout.setRight(stock_label);
+        // this.gameLayout.setRight(stockLabel);
     }
 
     private void handleGameLoop() {
@@ -222,7 +224,7 @@ public class GameplayScreen {
     // ------------------------------------------ GAMEPLAY HANDLES ---------------------------------------
 
     private void handleTurn() {
-        this.your_turn = true;
+        this.yourTurn = true;
         // gameLayout.setStyle("-fx-background-color: lightgreen;");
 
         Platform.runLater(() -> {
@@ -233,10 +235,10 @@ public class GameplayScreen {
     }
 
     private void handleStock(String data) {
-        stock_size = data;
+        stockSize = data;
         Platform.runLater(() -> {
-            int size = Integer.parseInt(stock_size);
-            stock_label.setText("Stock: " + size);
+            int size = Integer.parseInt(stockSize);
+            stockLabel.setText("Stock: " + size);
         });
     }
 
@@ -284,10 +286,10 @@ public class GameplayScreen {
         });
     
         Platform.runLater(() -> {
-            this.player2Label.setText(opponentName + " (Tiles: " + this.opp_tiles_size + ")");
+            this.player2Label.setText(opponentName + " (Tiles: " + this.opponentTiles + ")");
         });
         
-        for (int i = 1; i <= this.opp_tiles_size; i++) {
+        for (int i = 1; i <= this.opponentTiles; i++) {
             HBox plate_hBox = new HBox(20);
             StackPane plate = createDominoPlate(0, 0, "PLAYER2", "" + -1 + "");
     
@@ -356,7 +358,7 @@ public class GameplayScreen {
     private void handleNoAvailableMoves() {
         stock = true;
         Platform.runLater(() -> {
-            this.info_label.setText("No available moves. Drawing from stock...");
+            this.infoLabel.setText("No available moves. Drawing from stock...");
 
             // this.playPauseTransition();
         });
@@ -371,18 +373,18 @@ public class GameplayScreen {
     }
 
     private void handleOppDraw() {
-        this.opp_tiles_size++;    
+        this.opponentTiles++;    
         System.out.println(opponentName + " drew a tile.");
     }
     
     private void handlePlayed(String data) {
         tile = data;
-        this.your_turn = false;
-        this.sum_invalid_moves = 0;
+        this.yourTurn = false;
+        this.invalidMoveSum = 0;
 
         if (!stock) {
             Platform.runLater(() -> {
-                this.info_label.setText("You played: " + tile);
+                this.infoLabel.setText("You played: " + tile);
                 
                 // this.playPauseTransition();
             });
@@ -393,12 +395,12 @@ public class GameplayScreen {
 
     private void handleOppPlayed(String data) {
         tile = data;
-        this.your_turn = true;
-        this.opp_tiles_size--;
+        this.yourTurn = true;
+        this.opponentTiles--;
 
         if (!stock) {
             Platform.runLater(() -> {
-                this.info_label.setText("[" + this.opponentName + "] (opponent) played: " + this.tile);
+                this.infoLabel.setText("[" + this.opponentName + "] (opponent) played: " + this.tile);
             });
         } else stock = false;
             
@@ -407,7 +409,7 @@ public class GameplayScreen {
 
     private void handlePass() {
         Platform.runLater(() -> {
-            this.info_label.setText("No valid tiles to play and no more tiles in the stock. Passing turn.");
+            this.infoLabel.setText("No valid tiles to play and no more tiles in the stock. Passing turn.");
 
             // this.playPauseTransition();
         });
@@ -417,7 +419,7 @@ public class GameplayScreen {
 
     private void handleOppPass() {
         Platform.runLater(() -> {
-            this.info_label.setText("[" + this.opponentName + "] (opponent) has no valid tiles to play and the stock is empty. Passed the turn.");
+            this.infoLabel.setText("[" + this.opponentName + "] (opponent) has no valid tiles to play and the stock is empty. Passed the turn.");
 
             // this.playPauseTransition();
         });
@@ -434,7 +436,7 @@ public class GameplayScreen {
 
     private void handleInvalidMove() {
         Platform.runLater(() -> {
-            this.info_label.setText("Invalid move. Choose a different tile. (" + (++sum_invalid_moves) + ")");
+            this.infoLabel.setText("Invalid move. Choose a different tile. (" + (++invalidMoveSum) + ")");
         });
 
         System.out.println("Invalid move. Choose a different tile.");
@@ -460,7 +462,7 @@ public class GameplayScreen {
     private void playPauseTransition() {
         PauseTransition pause = new PauseTransition(Duration.seconds(4));
         pause.setOnFinished(event -> {
-            this.info_label.setText("");
+            this.infoLabel.setText("");
         });
         
         pause.play();
@@ -498,7 +500,7 @@ public class GameplayScreen {
     private StackPane createDominoPlate(int leftNumber, int rightNumber, String type, String index) {
         StackPane stackPanePlate = createRectangle(leftNumber, rightNumber, index);
         
-        if (type.equals("PLAYER1") && your_turn) {
+        if (type.equals("PLAYER1") && yourTurn) {
             stackPanePlate.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 String plateIndex = (String) stackPanePlate.getUserData();
                 toServer.println(plateIndex);
@@ -591,7 +593,7 @@ public class GameplayScreen {
         for (StackPane plate : this.player1Plates) {
             Platform.runLater(() -> {
                 Rectangle rectangle = (Rectangle) plate.getChildren().get(0);
-                rectangle.setFill(this.your_turn ? Color.LIGHTGREEN : Color.RED);
+                rectangle.setFill(this.yourTurn ? Color.LIGHTGREEN : Color.RED);
             });
         }
     }
