@@ -11,7 +11,7 @@ import java.util.Scanner;
  * The Client class represents the networked client that communicates with the DominoServer.
  * It handles receiving game state information from the server and sending user input back to the server.
  */
-public class Client {
+public class CommandLineClient {
 
     private static final int PORT = 7777; // The port used for communication with the server
     private Socket socket;
@@ -43,7 +43,7 @@ public class Client {
      * @param args Command-line arguments (not used).
      */
     public static void main(String[] args) {
-        new Client().startClient();
+        new CommandLineClient().startClient();
     }
 
     /**
